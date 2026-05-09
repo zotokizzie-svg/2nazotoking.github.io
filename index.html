@@ -1,10 +1,9 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>2NA ZOTO KING | Artist Management & Bookings</title>
+    <title>2NA ZOTO KING | Worldwide Store</title>
     <style>
         :root {
             --brand-red: #e63946;
@@ -15,165 +14,132 @@
         }
 
         body {
-            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Segoe UI', Roboto, sans-serif;
             background-color: var(--dark-bg);
             color: var(--text-light);
             margin: 0;
             padding: 0;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             text-align: center;
         }
 
         header {
             width: 100%;
-            padding: 50px 20px;
+            padding: 60px 20px;
             background: linear-gradient(135deg, var(--brand-red), #800000);
             border-bottom: 5px solid var(--brand-gold);
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            box-shadow: 0 5px 20px rgba(0,0,0,0.5);
         }
 
-        .hero-title {
-            font-size: 2.8rem;
-            margin: 0;
-            letter-spacing: 3px;
-            text-transform: uppercase;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-        }
+        .container { max-width: 900px; margin: auto; padding: 20px; }
 
-        .subtitle {
-            color: var(--brand-gold);
+        .currency-bar {
+            background: var(--brand-gold);
+            color: #000;
             font-weight: bold;
-            font-size: 1.2rem;
-            margin-top: 10px;
-        }
-
-        .container {
-            max-width: 900px;
-            padding: 20px;
+            padding: 10px;
+            font-size: 0.9rem;
+            text-transform: uppercase;
         }
 
         .section {
-            margin: 30px 0;
-            padding: 25px;
-            border-left: 5px solid var(--brand-green);
+            margin: 40px 0;
+            padding: 30px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 0 15px 15px 0;
+            border-radius: 15px;
+            border: 1px solid #30363d;
             text-align: left;
         }
 
-        h2 {
-            color: var(--brand-gold);
-            text-transform: uppercase;
-            margin-top: 0;
-            font-size: 1.5rem;
-        }
-
-        .management-grid {
+        .store-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
 
-        .mgmt-card {
-            background: rgba(0,0,0,0.4);
-            padding: 20px;
+        .card {
+            background: #161b22;
+            padding: 25px;
+            border-radius: 12px;
             border: 1px solid #30363d;
-            border-radius: 10px;
             transition: 0.3s;
         }
 
-        .mgmt-card:hover {
-            border-color: var(--brand-gold);
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.05);
+        .card:hover { border-color: var(--brand-green); transform: translateY(-5px); }
+
+        .price-tag {
+            font-size: 1.2rem;
+            color: var(--brand-gold);
+            font-weight: bold;
+            margin: 10px 0;
+            display: block;
         }
 
-        .btn {
+        .btn-global {
             display: block;
-            background-color: var(--brand-gold);
-            color: #000;
-            padding: 12px;
-            margin-top: 15px;
-            border-radius: 5px;
+            background-color: var(--brand-green);
+            color: white;
+            padding: 15px;
+            border-radius: 8px;
             text-decoration: none;
             font-weight: bold;
             text-align: center;
-            transition: 0.2s;
+            text-transform: uppercase;
+            box-shadow: 0 4px 10px rgba(6, 214, 160, 0.2);
         }
 
-        .btn:hover {
-            background-color: #fff;
-            color: var(--brand-red);
-        }
-
-        .footer {
-            margin-top: 50px;
-            padding: 30px;
-            background: #161b22;
-            width: 100%;
-            font-size: 0.9rem;
-            border-top: 1px solid #30363d;
-        }
-
-        .black-star { 
-            font-size: 2rem; 
-            color: #000; 
-            text-shadow: 0 0 8px var(--brand-gold); 
-            margin-bottom: 10px;
-        }
+        .footer { padding: 40px; background: #000; font-size: 0.8rem; color: #8b949e; }
     </style>
 </head>
 <body>
 
+    <div class="currency-bar">
+        ACCEPTED: USD ($) | EUR (€) | GBP (£) | GHS (₵) | CFA (Fr)
+    </div>
+
     <header>
-        <div class="black-star">★ ★ ★</div>
-        <h1 class="hero-title">2NA ZOTO KING</h1>
-        <div class="subtitle">Founder of Dope Cities Finest (DCF)</div>
+        <h1 style="font-size: 3rem; margin:0;">2NA ZOTO KING</h1>
+        <p style="color: var(--brand-gold); letter-spacing: 3px; font-weight: bold;">DOPE CITIES FINEST GLOBAL HUB</p>
     </header>
 
     <div class="container">
         
         <div class="section">
-            <h2>🌍 Global Management & Bookings</h2>
-            <p>The central hub for elite producers and artists. We specialize in linking talent for international tours, TV soundtracks, and major stage performances.</p>
+            <h2 style="color: var(--brand-gold);">🌍 WORLDWIDE DIGITAL STORE</h2>
+            <p>Get the official masters. Secure checkout for all international currencies and local Mobile Money.</p>
             
-            <div class="management-grid">
-                <div class="mgmt-card">
-                    <h3>Stage & Live</h3>
-                    <p>Book 2NA ZOTO KING for festivals, stadium tours, and high-energy live sets.</p>
-                    <a href="mailto:contact@2nazotoking.com" class="btn">Book Live Set</a>
+            <div class="store-grid">
+                <div class="card">
+                    <h3>Silk the GOD</h3>
+                    <p>Studio Master (WAV/MP3)</p>
+                    <span class="price-tag">$1.99 / €1.85 / ₵30</span>
+                    <a href="YOUR_PAYSTACK_LINK" class="btn-global">Buy Worldwide</a>
                 </div>
 
-                <div class="mgmt-card">
-                    <h3>TV & Media</h3>
-                    <p>Inquiries for show appearances, interviews, and broadcast synchronization.</p>
-                    <a href="mailto:contact@2nazotoking.com" class="btn">Media Inquiry</a>
-                </div>
-
-                <div class="mgmt-card">
-                    <h3>Producers & Touring</h3>
-                    <p>Linking worldwide producers for tour collaboration and production sessions.</p>
-                    <a href="mailto:contact@2nazotoking.com" class="btn">Link Producers</a>
+                <div class="card">
+                    <h3>X-Factor Anthem</h3>
+                    <p>Official DCF Anthem</p>
+                    <span class="price-tag">$1.99 / €1.85 / ₵30</span>
+                    <a href="YOUR_PAYSTACK_LINK" class="btn-global">Buy Worldwide</a>
                 </div>
             </div>
         </div>
 
         <div class="section">
-            <h2>🎵 The DCF Mission</h2>
-            <p><b>Dope Cities Finest</b> is more than a brand—it's a global standard. We are currently building the touring roster for 2026-2027. If you are a producer ready for the big stage, the link-up starts here.</p>
+            <h2 style="color: var(--brand-gold);">💼 MANAGEMENT & TOURING</h2>
+            <p>For Stage, TV shows, and Producer Link-ups.</p>
+            <a href="mailto:contact@2nazotoking.com" class="btn-global" style="background: transparent; border: 2px solid var(--brand-gold); color: var(--brand-gold);">Contact Manager</a>
         </div>
 
     </div>
 
     <div class="footer">
         &copy; 2026 2NA ZOTO KING | Dope Cities Finest Music Group <br>
-        <i>"Effective. Unchallenged. Global."</i>
+        <i>Payments Secured Globally. Money settles directly to Mobile Wallet.</i>
     </div>
 
-</bod>
-</htm>
+</body>
+</html>
+
 
   
