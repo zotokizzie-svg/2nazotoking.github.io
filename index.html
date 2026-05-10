@@ -52,23 +52,28 @@ function draw() {
 
 // AI'S STEP-BACK JUMPER
 // AI'S STEP-BACK LOGIC
-canvas.addEventListener("click", (e) => {
+canvas.addEventListener("mousedown", (e) => {
     if (!ball.flying) {
-        ball.vx = (ball.x - e.clientX) * 0.1;
-        ball.vy = (ball.y - e.clientY) * 0.1;
-        ball.flying = true;
-    }
-});
-r
-    if (!ball.flying) {
-        ball.vx = 19;  // Lightning speed
-        ball.vy = -21; // High arching step-back
+        ball.vx = (ball.x - e.clientX) * 0.15;
+        ball.vy = -21; 
         ball.flying = true;
     }
 });
 
-function update() {
-    // ELITE DEFENDER SPEED (Crossover timing)
+
+
+
+
+
+                   
+        
+
+    
+    
+        
+
+
+    
     defender.y += defender.speed * defender.dir;
     if(defender.y > 310 || defender.y < 40) defender.dir *= -1;
 
