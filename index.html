@@ -1,48 +1,66 @@
-<canvas id="gameCanvas" width="800" height="400" style="border: 2px solid var(--dcf-gold); background: #222; border-radius: 10px; cursor: crosshair;"></canvas>
+
+<canvas id="gameCanvas" width="800" height="400" style="border: 4px solid var(--dcf-gold); background: #222; border-radius: 15px; cursor: pointer;"></canvas>
 
 <script>
     const canvas = document.getElementById('gameCanvas');
     const ctx = canvas.getContext('2d');
 
-    // Game Variables
-    let ball = { x: 100, y: 300, radius: 10, vx: 0, vy: 0, flying: false };
+    // GAME ENGINE
+    let ball = { x: 100, y: 300, radius: 12, vx: 0, vy: 0, flying: false };
+    let defender = { x: 650, y: 150, w: 30, h: 80, speed: 4, dir: 1, name: "ROC NATION JAY-Z" };
     let score = 0;
     const gravity = 0.5;
-
-    // The Hoop (Mass Appeal / Roc Nation side)
-    const hoop = { x: 700, y: 150, w: 50, h: 10 };
+    const hoop = { x: 730, y: 180, w: 60, h: 10 };
 
     function draw() {
         ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // Draw Court Branding
-        ctx.fillStyle = "rgba(255, 204, 0, 0.1)";
-        ctx.font = "40px Arial Black";
-        ctx.fillText("DCF MUSIC", 300, 220);
+        // COURT BRANDING
+        ctx.fillStyle = "rgba(255, 204, 0, 0.2)";
+        ctx.font = "bold 40px Arial";
+        ctx.fillText("DOPE CITIES FINEST", 200, 210);
 
-        // Draw Hoop
-        ctx.fillStyle = "red";
+        // DRAW HOOP (The Target)
+        ctx.fillStyle = "var(--dcf-red)";
         ctx.fillRect(hoop.x, hoop.y, hoop.w, hoop.h);
 
-        // Draw Ball
+        // DRAW RIVAL DEFENDER (Jay-Z / Nas)
+        ctx.fillStyle = defender.name.includes("ROC") ? "black" : "#003366";
+        ctx.fillRect(defender.x, defender.y, defender.w, defender.height);
+        ctx.fillStyle = "white";
+        ctx.font = "12px Arial";
+        ctx.fillText(defender.name, defender.x - 20, defender.y - 10);
+        
+        // Defender Movement
+        defender.y += defender.speed * defender.dir;
+        if(defender.y > 300 || defender.y < 50) defender.dir *= -1;
+
+        // DRAW BALL (2na Zoto Kizzie's Shot)
         ctx.beginPath();
         ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-        ctx.fillStyle = "#ff6600";
+        ctx.fillStyle = "#ff6600"; // Orange
         ctx.fill();
-        ctx.closePath();
+        ctx.stroke();
 
+        // PHYSICS
         if (ball.flying) {
             ball.vy += gravity;
             ball.x += ball.vx;
             ball.y += ball.vy;
 
-            // Check for Score
-            if (ball.x > hoop.x && ball.x < hoop.x + hoop.w && ball.y > hoop.y && ball.y < hoop.y + hoop.h) {
-                score++;
-                alert("GOAL! DCFinest takes the lead!");
+            // COLLISION WITH DEFENDER (Blocked!)
+            if (ball.x > defender.x && ball.x < defender.x + defender.w && ball.y > defender.y && ball.y < defender.y + defender.height) {
+                alert("BLOCKED BY THE ROC! Try again.");
                 resetBall();
             }
-            if (ball.y > canvas.height) resetBall();
+
+            // SCORE DETECTION
+            if (ball.x > hoop.x && ball.x < hoop.x + hoop.w && ball.y > hoop.y && ball.y < hoop.y + hoop.h) {
+                score++;
+                alert("BUCKET! 2na Zoto Kizzie scores on the legends!");
+                resetBall();
+            }
+            if (ball.y > 450) resetBall();
         }
         requestAnimationFrame(draw);
     }
@@ -54,12 +72,14 @@
     canvas.addEventListener('mousedown', () => {
         if(!ball.flying) {
             ball.flying = true;
-            ball.vx = 12; // Power
-            ball.vy = -15; // Arc
+            ball.vx = 14; 
+            ball.vy = -16;
+            // Play song here if you have it uploaded
+            const track = document.getElementById('dcfPlayer');
+            if(track) track.play();
         }
     });
 
     draw();
 </script>
-
 
