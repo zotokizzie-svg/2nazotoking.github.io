@@ -1,104 +1,89 @@
-
-<canvas id="gameCanvas" width="800" height="400" style="border: 4px solid var(--dcf-gold); background: #222; border-radius: 15px; cursor: pointer;"></canvas>
-
 <script>
-    const canvas = document.getElementById('gameCanvas');
-    const ctx = canvas.getContext('2d');
+const canvas = document.getElementById('gameCanvas');
+const ctx = canvas.getContext('2d');
 
-    // GAME ENGINE
-    let ball = { x: 100, y: 300, radius: 12, vx: 0, vy: 0, flying: false };
-    let defender = { x: 650, y: 150, w: 30, h: 80, speed: 4, dir: 1, name: "ROC NATION JAY-Z" };
-    let score = 0;
-    const gravity = 0.5;
-    const hoop = { x: 730, y: 180, w: 60, h: 10 };
+// THE ANSWER ENGINE 
+let ball = { x: 100, y: 300, radius: 11, vx: 0, vy: 0, flying: false };
+let defender = { x: 650, y: 150, w: 25, h: 85, speed: 9, dir: 1, name: "TYRONN LUE" }; 
+let score = 0;
+const gravity = 0.75; 
+const hoop = { x: 730, y: 180, w: 60, h: 10 };
 
-    function draw() {
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
+function draw() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-        // COURT BRANDING
-        ctx.fillStyle = "rgba(255, 204, 0, 0.2)";
-        ctx.font = "bold 40px Arial";
-        ctx.fillText("DOPE CITIES FINEST", 200, 210);
+    // PHILLY BLACK-TOP COURT BRANDING
+    ctx.fillStyle = "rgba(237, 23, 76, 0.1)"; 
+    ctx.font = "italic bold 45px Impact";
+    ctx.fillText("DOPE CITIES FINEST", 140, 210);
+    ctx.font = "bold 18px Courier New";
+    ctx.fillStyle = "white";
+    ctx.fillText("I3: THE ANSWER EDITION", 280, 245);
 
-        // DRAW HOOP (The Target)
-        ctx.fillStyle = "var(--dcf-red)";
-        ctx.fillRect(hoop.x, hoop.y, hoop.w, hoop.h);
+    // DRAW HOOP (Rim and Net)
+    ctx.fillStyle = "#ED174C"; // Red Rim
+    ctx.fillRect(hoop.x, hoop.y, hoop.w, hoop.h);
+    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; // White Net
+    ctx.strokeRect(hoop.x + 10, hoop.y + 10, 40, 30);
 
-        // DRAW RIVAL DEFENDER (Jay-Z / Nas)
-        ctx.fillStyle = defender.name.includes("ROC") ? "black" : "#003366";
-        ctx.fillRect(defender.x, defender.y, defender.w, defender.height);
-        ctx.fillStyle = "white";
-        ctx.font = "12px Arial";
-        ctx.fillText(defender.name, defender.x - 20, defender.y - 10);
-        
-        // Defender Movement
-        defender.y += defender.speed * defender.dir;
-        if(defender.y > 300 || defender.y < 50) defender.dir *= -1;
+    // DRAW DEFENDER (With Headband)
+    ctx.fillStyle = "#222"; // Jersey
+    ctx.fillRect(defender.x, defender.y, defender.w, defender.h);
+    ctx.fillStyle = "white"; // Headband
+    ctx.fillRect(defender.x, defender.y + 10, defender.w, 8);
+    ctx.fillStyle = "white";
+    ctx.font = "12px Courier New";
+    ctx.fillText(defender.name, defender.x - 25, defender.y - 15);
 
-        // DRAW BALL (2na Zoto Kizzie's Shot)
-        ctx.beginPath();
-        ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-        ctx.fillStyle = "#ff6600"; // Orange
-        ctx.fill();
-        ctx.stroke();
+    // DRAW BALL (Black & Silver 'Queston' Vibes)
+    ctx.beginPath();
+    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
+    ctx.fillStyle = "#333"; 
+    ctx.fill();
+    ctx.strokeStyle = "#ED174C"; // Red Stitching
+    ctx.lineWidth = 2;
+    ctx.stroke();
 
-        // PHYSICS
-        if (ball.flying) {
-            ball.vy += gravity;
-            ball.x += ball.vx;
-            ball.y += ball.vy;
+    // DRAW SCORE
+    ctx.fillStyle = "#ED174C";
+    ctx.font = "24px Impact";
+    ctx.fillText("BUCKETS: " + score, 20, 40);
+}
 
-            // COLLISION WITH DEFENDER (Blocked!)
-            if (ball.x > defender.x && ball.x < defender.x + defender.w && ball.y > defender.y && ball.y < defender.y + defender.height) {
-                alert("BLOCKED BY THE ROC! Try again.");
-                resetBall();
-            }
-
-            // SCORE DETECTION
-            if (ball.x > hoop.x && ball.x < hoop.x + hoop.w && ball.y > hoop.y && ball.y < hoop.y + hoop.h) {
-                score++;
-                alert("BUCKET! 2na Zoto Kizzie scores on the legends!");
-                resetBall();
-            }
-            if (ball.y > 450) resetBall();
-        }
-        requestAnimationFrame(draw);
+// AI'S STEP-BACK JUMPER
+// AI'S STEP-BACK LOGIC
+canvas.addEventListener("click", (e) => {
+    if (!ball.flying) {
+        ball.vx = (ball.x - e.clientX) * 0.1;
+        ball.vy = (ball.y - e.clientY) * 0.1;
+        ball.flying = true;
     }
-
-    function resetBall() {
-        ball.flying = false; ball.x = 100; ball.y = 300; ball.vx = 0; ball.vy = 0;
+});
+r
+    if (!ball.flying) {
+        ball.vx = 19;  // Lightning speed
+        ball.vy = -21; // High arching step-back
+        ball.flying = true;
     }
+});
 
-    canvas.addEventListener('mousedown', () => {
-        if(!ball.flying) {
-            ball.flying = true;
-            ball.vx = 14; 
-            ball.vy = -16;
-            // Play song here if you have it uploaded
-            const track = document.getElementById('dcfPlayer');
-            if(track) track.play();
-        }
-83    draw(); 
-84
-85function update() {
-    // Moves the defender back and forth
+function update() {
+    // ELITE DEFENDER SPEED (Crossover timing)
     defender.y += defender.speed * defender.dir;
-    if(defender.y > 300 || defender.y < 50) defender.dir *= -1;
+    if(defender.y > 310 || defender.y < 40) defender.dir *= -1;
 
-    // Moves the ball and checks for a score
     if (ball.flying) {
-        ball.vy += 0.5; // Gravity
+        ball.vy += gravity;
         ball.x += ball.vx;
         ball.y += ball.vy;
 
-        // Did you score?
+        // Scoring Logic
         if (ball.x > hoop.x && ball.x < hoop.x + hoop.w &&
             ball.y > hoop.y && ball.y < hoop.y + hoop.h) {
             score++;
             resetBall();
         }
 
-        // Did you miss?
         if (ball.y > 400 || ball.x > 800) {
             resetBall();
         }
@@ -106,20 +91,18 @@
 }
 
 function resetBall() {
-    ball.x = 100;
-    ball.y = 300;
-    ball.vx = 0;
-    ball.vy = 0;
+    ball.x = 100; ball.y = 300;
+    ball.vx = 0; ball.vy = 0;
     ball.flying = false;
 }
 
 function gameLoop() {
-    update(); // Calculates movement
-    draw();   // Draws the frame
+    update();
+    draw();
     requestAnimationFrame(gameLoop);
 }
+
 gameLoop();
 </script>
-
 
 
