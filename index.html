@@ -1,113 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>DCF: The Answer Edition</title>
+    <style>
+        body { margin: 0; background: #000; overflow: hidden; font-family: sans-serif; }
+        #status { position: fixed; top: 15px; width: 100%; text-align: center; color: #ED174C; font-weight: bold; z-index: 10; letter-spacing: 1px; }
+        canvas { display: block; background: radial-gradient(circle, #1a1a1a 0%, #000 100%); touch-action: none; }
+    </style>
+</head>
+<body>
+    <div id="status">INITIALIZING DCF ENGINE...</div>
+    <canvas id="game"></canvas>
+
 <script>
-const canvas = document.getElementById('gameCanvas');
-const ctx = canvas.getContext('2d');
+    // --- AUTO-FIXER ---
+    window.onerror = function() { location.reload(); return true; };
 
-// THE ANSWER ENGINE 
-let ball = { x: 100, y: 300, radius: 11, vx: 0, vy: 0, flying: false };
-let defender = { x: 650, y: 150, w: 25, h: 85, speed: 9, dir: 1, name: "TYRONN LUE" }; 
-let score = 0;
-const gravity = 0.75; 
-const hoop = { x: 730, y: 180, w: 60, h: 10 };
-
-function draw() {
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-    // PHILLY BLACK-TOP COURT BRANDING
-    ctx.fillStyle = "rgba(237, 23, 76, 0.1)"; 
-    ctx.font = "italic bold 45px Impact";
-    ctx.fillText("DOPE CITIES FINEST", 140, 210);
-    ctx.font = "bold 18px Courier New";
-    ctx.fillStyle = "white";
-    ctx.fillText("I3: THE ANSWER EDITION", 280, 245);
-
-    // DRAW HOOP (Rim and Net)
-    ctx.fillStyle = "#ED174C"; // Red Rim
-    ctx.fillRect(hoop.x, hoop.y, hoop.w, hoop.h);
-    ctx.strokeStyle = "rgba(255, 255, 255, 0.5)"; // White Net
-    ctx.strokeRect(hoop.x + 10, hoop.y + 10, 40, 30);
-
-    // DRAW DEFENDER (With Headband)
-    ctx.fillStyle = "#222"; // Jersey
-    ctx.fillRect(defender.x, defender.y, defender.w, defender.h);
-    ctx.fillStyle = "white"; // Headband
-    ctx.fillRect(defender.x, defender.y + 10, defender.w, 8);
-    ctx.fillStyle = "white";
-    ctx.font = "12px Courier New";
-    ctx.fillText(defender.name, defender.x - 25, defender.y - 15);
-
-    // DRAW BALL (Black & Silver 'Queston' Vibes)
-    ctx.beginPath();
-    ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI*2);
-    ctx.fillStyle = "#333"; 
-    ctx.fill();
-    ctx.strokeStyle = "#ED174C"; // Red Stitching
-    ctx.lineWidth = 2;
-    ctx.stroke();
-
-    // DRAW SCORE
-    ctx.fillStyle = "#ED174C";
-    ctx.font = "24px Impact";
-    ctx.fillText("BUCKETS: " + score, 20, 40);
-}
-
-// AI'S STEP-BACK JUMPER
-// AI'S STEP-BACK LOGIC
-canvas.addEventListener("mousedown", (e) => {
-    if (!ball.flying) {
-        ball.vx = (ball.x - e.clientX) * 0.15;
-        ball.vy = -21; 
-        ball.flying = true;
+    const canvas = document.getElementById('game');
+    const ctx = canvas.getContext('2d');
+    
+    function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
-});
+    window.onresize = resize;
+    resize();
 
+    let ball = { x: 60, y: canvas.height - 60, r: 18, vx: 0, vy: 0, flying: false };
+    let hoop = { x: canvas.width - 80, y: 200, w: 60, h: 10 };
+    let score = 0;
 
-
-
-
-
-                   
+    function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
         
+        // BRANDING
+        ctx.fillStyle = "rgba(237, 23, 76, 0.2)";
+        ctx.font = "bold 35px Arial";
+        ctx.fillText("DOPE CITIES FINEST", 20, canvas.height/2);
 
-    
-    
-        
+        ctx.fillStyle = "#ED174C";
+        ctx.font = "bold 20px Arial";
+        ctx.fillText("BUCKETS: " + score, 20, 50);
 
+        // HOOP
+        ctx.fillStyle = "#fff";
+        ctx.fillRect(hoop.x, hoop.y, hoop.w, hoop.h);
 
-    
-    defender.y += defender.speed * defender.dir;
-    if(defender.y > 310 || defender.y < 40) defender.dir *= -1;
+        // BALL
+        ctx.beginPath();
+        ctx.arc(ball.x, ball.y, ball.r, 0, Math.PI*2);
+        ctx.fillStyle = "#ED174C";
+        ctx.fill();
+        ctx.strokeStyle = "#fff";
+        ctx.lineWidth = 2;
+        ctx.stroke();
 
-    if (ball.flying) {
-        ball.vy += gravity;
-        ball.x += ball.vx;
-        ball.y += ball.vy;
+        update();
+        requestAnimationFrame(draw);
+    }
 
-        // Scoring Logic
-        if (ball.x > hoop.x && ball.x < hoop.x + hoop.w &&
-            ball.y > hoop.y && ball.y < hoop.y + hoop.h) {
-            score++;
-            resetBall();
-        }
+    function update() {
+        if (ball.flying) {
+            ball.vy += 0.8; 
+            ball.x += ball.vx;
+            ball.y += ball.vy;
 
-        if (ball.y > 400 || ball.x > 800) {
-            resetBall();
+            if (ball.x > hoop.x && ball.x < hoop.x + hoop.w && ball.y > hoop.y && ball.y < hoop.y + 25) {
+                score++;
+                reset();
+            }
+            if (ball.y > canvas.height || ball.x > canvas.width) reset();
         }
     }
-}
 
-function resetBall() {
-    ball.x = 100; ball.y = 300;
-    ball.vx = 0; ball.vy = 0;
-    ball.flying = false;
-}
+    function reset() {
+        ball.flying = false;
+        ball.x = 60;
+        ball.y = canvas.height - 60;
+        document.getElementById('status').innerText = "TAP TO SHOOT";
+    }
 
-function gameLoop() {
-    update();
+    const launch = (e) => {
+        if (e) e.preventDefault();
+        if (!ball.flying) {
+            ball.vx = (canvas.width / 16); 
+            ball.vy = -21;
+            ball.flying = true;
+            document.getElementById('status').innerText = "BALL IN AIR";
+        }
+    };
+
+    canvas.addEventListener("mousedown", launch);
+    canvas.addEventListener("touchstart", launch);
+
     draw();
-    requestAnimationFrame(gameLoop);
-}
-
-gameLoop();
+    document.getElementById('status').innerText = "READY: TAP SCREEN";
 </script>
+</body>
+</html>
+
 
 
