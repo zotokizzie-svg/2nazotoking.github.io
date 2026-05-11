@@ -39,9 +39,11 @@ const venues = [
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+        renderer.setClearColor(0x000000, 0); 
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        document.body.appendChild(renderer.domElement);
+
     textureLoader = new THREE.TextureLoader();
 
     // Lighting
@@ -52,7 +54,8 @@ function init() {
 
     // Court
     const floorGeo = new THREE.PlaneGeometry(30, 60);
-    const floorMat = new THREE.MeshPhongMaterial({ color: venues[currentVenue].floor });
+    const floorMat = new THREE.MeshBasicMaterial({ visible: false });
+
     court = new THREE.Mesh(floorGeo, floorMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
