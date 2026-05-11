@@ -2,114 +2,147 @@
 <html>
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
-    <title>DCF 3D ARENA</title>
+    <title>DCF 3x3 TOURNAMENT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #ui { position: absolute; top: 15px; width: 100%; text-align: center; color: #ED174C; pointer-events: none; text-shadow: 2px 2px #000; }
-        .btn-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; }
-        .btn { background: #0088cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; }
+        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
+        #ui { position: absolute; top: 10px; width: 100%; text-align: center; color: #fff; pointer-events: none; }
+        .stats { font-size: 20px; color: #ffcc00; text-shadow: 2px 2px #000; }
+        .venue-btn { position: absolute; top: 10px; right: 10px; padding: 10px; background: #ED174C; color: #fff; border: none; cursor: pointer; border-radius: 5px; pointer-events: auto; }
+        #controls { position: absolute; bottom: 20px; width: 100%; text-align: center; color: #fff; font-size: 12px; }
     </style>
 </head>
 <body>
 
 <div id="ui">
-    <h2 style="margin:0;">DCF 3D ARENA</h2>
-    <div id="score" style="font-size: 24px; font-weight: bold;">BUCKETS: 0</div>
-    <p style="color: #fff; font-size: 12px;">TAP TO SHOOT</p>
+    <h2 style="margin:0; color: #ED174C;">DCF vs THE LEGENDS</h2>
+    <div class="stats" id="score">BUCKETS: 0 | TIME: 60</div>
 </div>
 
-<div class="btn-container">
-    <a href="https://t.me/DCF_sales_bot" target="_blank" class="btn">DCF SALES BOT</a>
-</div>
+<button class="venue-btn" onclick="switchVenue()">SWITCH VENUE</button>
+
+<div id="controls">TAP SCREEN TO CROSSOVER & SHOOT</div>
 
 <script>
-let scene, camera, renderer, ball, hoop, court;
-let score = 0;
-let isShooting = false;
+let scene, camera, renderer, ball, hoop, court, textureLoader;
+let score = 0, timeLeft = 60, isShooting = false;
 let velocity = new THREE.Vector3();
+let players = [];
+let currentVenue = 0; // 0: Street, 1: Beach
+
+const venues = [
+    { name: "Street", floor: 0x333333, ambient: 0x404040 },
+    { name: "Beach", floor: 0xd2b48c, ambient: 0xffffff }
+];
 
 function init() {
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x0a0a0a);
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    textureLoader = new THREE.TextureLoader();
 
-    const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
-    const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500, shininess: 80 });
-    ball = new THREE.Mesh(ballGeo, ballMat);
-    scene.add(ball);
+    // Lighting
+    const sun = new THREE.DirectionalLight(0xffffff, 1.2);
+    sun.position.set(5, 10, 7);
+    scene.add(sun);
+    scene.add(new THREE.AmbientLight(venues[currentVenue].ambient));
 
-    const courtGeo = new THREE.PlaneGeometry(20, 40);
-    const courtMat = new THREE.MeshPhongMaterial({ color: 0x222222, side: THREE.DoubleSide });
-    court = new THREE.Mesh(courtGeo, courtMat);
+    // Court
+    const floorGeo = new THREE.PlaneGeometry(30, 60);
+    const floorMat = new THREE.MeshPhongMaterial({ color: venues[currentVenue].floor });
+    court = new THREE.Mesh(floorGeo, floorMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
-    const hoopGeo = new THREE.TorusGeometry(0.8, 0.08, 16, 100);
-    const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-    hoop = new THREE.Mesh(hoopGeo, hoopMat);
-    hoop.position.set(0, 6, -10);
+    // Basketball
+    const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
+    const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500 });
+    ball = new THREE.Mesh(ballGeo, ballMat);
+    scene.add(ball);
+
+    // The Hoop
+    const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
+    hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
+    hoop.position.set(0, 6, -15);
     hoop.rotation.x = Math.PI / 2;
     scene.add(hoop);
 
-    const light = new THREE.PointLight(0xffffff, 1.5, 100);
-    light.position.set(5, 10, 10);
-    scene.add(light);
-    scene.add(new THREE.AmbientLight(0x404040));
+    // Create 3-on-3 Players (Billboards)
+    createPlayer(0, 3, -5, "YOU (2NA ZOTO)"); // Captain
+    createPlayer(-4, 2, -10, "DEFENDER 1");   // Jay-Z
+    createPlayer(4, 2, -10, "DEFENDER 2"); 
 
-    camera.position.set(0, 5, 10);
+    camera.position.set(0, 6, 12);
     camera.lookAt(0, 4, -5);
 
     resetBall();
-
+    window.addEventListener('touchstart', shoot);
     window.addEventListener('mousedown', shoot);
-    window.addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); }, { passive: false });
-
+    
+    startTimer();
     animate();
 }
 
+function createPlayer(x, y, z, label) {
+    // In a real version, you'd use textureLoader.load('your_image.png')
+    const playerGeo = new THREE.PlaneGeometry(3, 5);
+    const playerMat = new THREE.MeshLambertMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
+    const player = new THREE.Mesh(playerGeo, playerMat);
+    player.position.set(x, 2.5, z);
+    scene.add(player);
+    players.push(player);
+}
+
+function switchVenue() {
+    currentVenue = (currentVenue + 1) % venues.length;
+    court.material.color.setHex(venues[currentVenue].floor);
+    alert("Moving to " + venues[currentVenue].name + " Court!");
+}
+
+function startTimer() {
+    setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            document.getElementById('score').innerText = `BUCKETS: ${score} | TIME: ${timeLeft}`;
+        }
+    }, 1000);
+}
+
 function shoot() {
-    if (isShooting) return;
+    if (isShooting || timeLeft <= 0) return;
     isShooting = true;
-    velocity.set(0, 0.18, -0.25);
+    velocity.set(0, 0.19, -0.28);
 }
 
 function animate() {
     requestAnimationFrame(animate);
-    
     if (isShooting) {
         ball.position.add(velocity);
-        velocity.y -= 0.006;
-        ball.rotation.x += 0.1;
-
-        let dist = ball.position.distanceTo(new THREE.Vector3(0, 6, -10));
+        velocity.y -= 0.007; 
+        
+        let dist = ball.position.distanceTo(new THREE.Vector3(0, 6, -15));
         if (dist < 0.8) {
-            score++;
-            document.getElementById('score').innerText = "BUCKETS: " + score;
+            score += 2;
             resetBall();
         }
-
         if (ball.position.y < 0.5) resetBall();
     }
+    
+    // Make players "breathe" or move slightly
+    players.forEach((p, i) => {
+        p.position.x += Math.sin(Date.now() * 0.002 + i) * 0.01;
+    });
 
     renderer.render(scene, camera);
 }
 
 function resetBall() {
     isShooting = false;
-    ball.position.set(0, 1, 5);
-    velocity.set(0, 0, 0);
+    ball.position.set(0, 1.5, 6);
+    velocity.set(0,0,0);
 }
-
-window.addEventListener('resize', () => {
-    camera.aspect = window.innerWidth / window.innerHeight;
-    camera.updateProjectionMatrix();
-    renderer.setSize(window.innerWidth, window.innerHeight);
-});
 
 init();
 </script>
