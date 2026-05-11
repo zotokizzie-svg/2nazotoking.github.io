@@ -1,4 +1,47 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DCF WORLD TOUR 3x3</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Arial Black', sans-serif; }
+        #ui { position: absolute; top: 10px; width: 100%; text-align: center; color: #fff; pointer-events: none; z-index: 10; }
+        .stats { font-size: 20px; color: #ffcc00; text-shadow: 2px 2px #000; }
+        #gold-ui { position: absolute; top: 60px; left: 10px; color: #FFD700; font-size: 18px; text-shadow: 2px 2px #000; z-index: 20; }
+        #store-btn { position: absolute; top: 90px; left: 10px; background: #FFD700; color: #000; border: none; padding: 5px 10px; font-weight: bold; border-radius: 5px; cursor: pointer; pointer-events: auto; z-index: 20; }
+        #location-tag { position: absolute; top: 10px; right: 10px; color: #fff; background: rgba(0,0,0,0.5); padding: 5px 15px; border-radius: 20px; font-size: 14px; }
+    </style>
+</head>
+<body>
+
+<div id="ui">
+    <h2 style="margin:0; color: #ED174C;">DCF WORLD TOUR</h2>
+    <div class="stats" id="score">BUCKETS: 0 | TIME: 60</div>
+</div>
+
+<div id="location-tag">LOCATION: GHANA 🇬🇭</div>
+<div id="gold-ui">GOLD: <span id="gold-count">0</span></div>
+<button id="store-btn" onclick="toggleStore()">DCF STORE</button>
+
+<script>
+let goldCoins = localStorage.getItem('dcfGold') ? parseInt(localStorage.getItem('dcfGold')) : 0;
+let venueIndex = localStorage.getItem('dcfVenue') ? parseInt(localStorage.getItem('dcfVenue')) : 0;
+let scene, camera, renderer, ball, hoop, court;
+let score = 0, timeLeft = 60, isShooting = false;
+let velocity = new THREE.Vector3();
+let players = [];
+
+const venues = [
+    { country: "GHANA 🇬🇭", floor: 0x006B3F, ambient: 0xffffff },
+    { country: "USA 🇺🇸", floor: 0x002868, ambient: 0x404040 },
+    { country: "NIGERIA 🇳🇬", floor: 0xffffff, ambient: 0xdddddd },
+    { country: "UK 🇬🇧", floor: 0xCF142B, ambient: 0xbbbbbb }
+];
+
 function init() {
+    document.getElementById('gold-count').innerText = goldCoins;
+    document.getElementById('location-tag').innerText = "LOCATION: " + venues[venueIndex].country;
+
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
@@ -6,40 +49,32 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    textureLoader = new THREE.TextureLoader();
-
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(5, 10, 7);
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(venues[currentVenue].ambient, 1));
+    scene.add(new THREE.AmbientLight(venues[venueIndex].ambient, 1.5));
 
     const floorGeo = new THREE.PlaneGeometry(30, 60);
-    const floorMat = new THREE.MeshBasicMaterial({ color: venues[currentVenue].floor });
+    const floorMat = new THREE.MeshPhongMaterial({ color: venues[venueIndex].floor });
     court = new THREE.Mesh(floorGeo, floorMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
-    // Spalding Basketball Setup
+    // SPALDING BASKETBALL
     const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
-    const ballMat = new THREE.MeshPhongMaterial({ 
-        color: 0xBF5700, // Spalding Burnt Orange
-        specular: 0x111111, 
-        shininess: 10 
-    });
+    const ballMat = new THREE.MeshPhongMaterial({ color: 0xBF5700, specular: 0x111111, shininess: 10 });
     ball = new THREE.Mesh(ballGeo, ballMat);
     scene.add(ball);
 
-    // The Hoop
     const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
     const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     hoop = new THREE.Mesh(hoopGeo, hoopMat);
     hoop.position.set(0, 8, -15);
     scene.add(hoop);
 
-    // The Players
-    createPlayer(0, 3, -5, "YOU (2NA ZOTO)");
-    createPlayer(-4, 2, -10, "LEBRON");
-    createPlayer(4, 2, -10, "THE ANSWER");
+    createPlayer(0, 3, -5, "YOU");
+    createPlayer(-4, 2, -10, "DEFENDER 1");
+    createPlayer(4, 2, -10, "DEFENDER 2");
 
     camera.position.set(0, 6, 12);
     camera.lookAt(0, 4, -5);
@@ -50,3 +85,75 @@ function init() {
     startTimer();
     animate();
 }
+
+function createPlayer(x, y, z, label) {
+    const playerGeo = new THREE.PlaneGeometry(3, 5);
+    const playerMat = new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide });
+    const p = new THREE.Mesh(playerGeo, playerMat);
+    p.position.set(x, y, z);
+    scene.add(p);
+    players.push(p);
+}
+
+function shoot() {
+    if (isShooting || timeLeft <= 0) return;
+    isShooting = true;
+    velocity.set(0, 0.22, -0.32);
+}
+
+function resetBall() {
+    isShooting = false;
+    ball.position.set(0, 1.5, 6);
+    velocity.set(0, 0, 0);
+}
+
+function startTimer() {
+    const timer = setInterval(() => {
+        if (timeLeft > 0) {
+            timeLeft--;
+            document.getElementById('score').innerText = `BUCKETS: ${score} | TIME: ${timeLeft}`;
+        } else {
+            clearInterval(timer);
+            checkWin();
+        }
+    }, 1000);
+}
+
+function checkWin() {
+    if (score >= 10) {
+        let nextVenue = (venueIndex + 1) % venues.length;
+        localStorage.setItem('dcfVenue', nextVenue);
+        localStorage.setItem('dcfGold', goldCoins);
+        alert("CHAMPION! Flying to " + venues[nextVenue].country + "!");
+        location.reload(); 
+    } else {
+        alert("GAME OVER! You need 10 Buckets to travel. Try again!");
+        location.reload();
+    }
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    if (isShooting) {
+        ball.position.add(velocity);
+        velocity.y -= 0.008;
+        let dist = ball.position.distanceTo(new THREE.Vector3(0, 8, -15));
+        if (dist < 0.8) {
+            score += 2;
+            goldCoins += 50;
+            document.getElementById('gold-count').innerText = goldCoins;
+            resetBall();
+        }
+        if (ball.position.y < 0.5) resetBall();
+    }
+    renderer.render(scene, camera);
+}
+
+function toggleStore() {
+    alert("DCF GLOBAL STORE: Earn 500 Gold to unlock Artists!");
+}
+
+init();
+</script>
+</body>
+</html>
