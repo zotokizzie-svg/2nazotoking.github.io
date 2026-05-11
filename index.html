@@ -1,43 +1,3 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>DCF 3x3 TOURNAMENT</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Arial Black', sans-serif; }
-        #ui { position: absolute; top: 10px; width: 100%; text-align: center; color: #fff; pointer-events: none; }
-        .stats { font-size: 20px; color: #ffcc00; text-shadow: 2px 2px #000; }
-        .venue-btn { position: absolute; top: 10px; right: 10px; padding: 10px; background: #ED174C; color: #fff; border: none; font-weight: bold; cursor: pointer; pointer-events: auto; }
-        #controls { position: absolute; bottom: 20px; width: 100%; text-align: center; color: #fff; font-size: 12px; }
-    </style>
-</head>
-<body>
-
-<div id="ui">
-    <h2 style="margin:0; color: #ED174C;">DCF vs THE LEGENDS</h2>
-    <div class="stats" id="score">BUCKETS: 0 | TIME: 60</div>
-</div>
-
-<button class="venue-btn" onclick="switchVenue()">SWITCH VENUE</button>
-
-<div id="controls">TAP SCREEN TO CROSSOVER & SHOOT</div>
-<div id="gold-ui" style="position: absolute; top: 60px; left: 10px; color: #FFD700; font-size: 18px; text-shadow: 2px 2px #000; z-index: 100;">GOLD: <span id="gold-count">0</span></div>
-<button id="store-btn" onclick="toggleStore()" style="position: absolute; top: 90px; left: 10px; background: #FFD700; color: #000; border: none; padding: 5px 10px; font-weight: bold; border-radius: 5px; z-index: 100;">DCF STORE</button>
-
-<script>
-let goldCoins = 0;
-let unlockedPlayers = ['YOU'];
-let scene, camera, renderer, ball, hoop, court, textureLoader;
-let score = 0, timeLeft = 60, isShooting = false;
-let velocity = new THREE.Vector3();
-let players = [];
-let currentVenue = 0;
-
-const venues = [
-    { name: "Street", floor: 0x333333, ambient: 0x404040 },
-    { name: "Beach", floor: 0xd2b48c, ambient: 0xffffff }
-];
-
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -59,17 +19,24 @@ function init() {
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
+    // Spalding Basketball Setup
     const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
-    const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500 });
+    const ballMat = new THREE.MeshPhongMaterial({ 
+        color: 0xBF5700, // Spalding Burnt Orange
+        specular: 0x111111, 
+        shininess: 10 
+    });
     ball = new THREE.Mesh(ballGeo, ballMat);
     scene.add(ball);
 
+    // The Hoop
     const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
     const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
     hoop = new THREE.Mesh(hoopGeo, hoopMat);
     hoop.position.set(0, 8, -15);
     scene.add(hoop);
 
+    // The Players
     createPlayer(0, 3, -5, "YOU (2NA ZOTO)");
     createPlayer(-4, 2, -10, "LEBRON");
     createPlayer(4, 2, -10, "THE ANSWER");
@@ -83,67 +50,3 @@ function init() {
     startTimer();
     animate();
 }
-
-function createPlayer(x, y, z, label) {
-    const playerGeo = new THREE.PlaneGeometry(3, 5);
-    const playerMat = new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide });
-    const p = new THREE.Mesh(playerGeo, playerMat);
-    p.position.set(x, y, z);
-    scene.add(p);
-    players.push(p);
-}
-
-function shoot() {
-    if (isShooting || timeLeft <= 0) return;
-    isShooting = true;
-    velocity.set(0, 0.2, -0.3);
-}
-
-function resetBall() {
-    isShooting = false;
-    ball.position.set(0, 1.5, 6);
-    velocity.set(0, 0, 0);
-}
-
-function startTimer() {
-    setInterval(() => {
-        if (timeLeft > 0) {
-            timeLeft--;
-            document.getElementById('score').innerText = `BUCKETS: ${score} | TIME: ${timeLeft}`;
-        }
-    }, 1000);
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    if (isShooting) {
-        ball.position.add(velocity);
-        velocity.y -= 0.007;
-        let dist = ball.position.distanceTo(new THREE.Vector3(0, 8, -15));
-        if (dist < 0.8) {
-            score += 2;
-            goldCoins += 50;
-            document.getElementById('gold-count').innerText = goldCoins;
-            resetBall();
-        }
-        if (ball.position.y < 0.5) resetBall();
-    }
-    renderer.render(scene, camera);
-}
-
-function switchVenue() {
-    currentVenue = (currentVenue + 1) % venues.length;
-    location.reload(); 
-}
-
-function toggleStore() {
-    alert("DCF GLOBAL STORE: Earn 500 Gold to unlock Musicians and Legends!");
-}
-
-init();
-</script>
-</body>
-</html>
-
-
-
