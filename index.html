@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html>
 <head>
@@ -7,102 +6,112 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         body { margin: 0; overflow: hidden; background: #000; font-family: sans-serif; }
-        #ui { position: absolute; top: 15px; width: 100%; text-align: center; color: #ED174C; pointer-events: none; text-shadow: 2px 2px 4px #000; }
+        #ui { position: absolute; top: 15px; width: 100%; text-align: center; color: #ED174C; pointer-events: none; text-shadow: 2px 2px #000; }
         .btn-container { position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%); z-index: 100; }
+        .btn { background: #0088cc; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold; }
     </style>
 </head>
 <body>
 
 <div id="ui">
     <h2 style="margin:0;">DCF 3D ARENA</h2>
-    <div id="score" style="font-size: 20px; font-weight: bold;">BUCKETS: 0</div>
+    <div id="score" style="font-size: 24px; font-weight: bold;">BUCKETS: 0</div>
+    <p style="color: #fff; font-size: 12px;">TAP TO SHOOT</p>
 </div>
 
 <div class="btn-container">
-    <a href="https://t.me/DCF_sales_bot" target="_blank" style="background:#0088cc; color:white; padding:12px 24px; text-decoration:none; font-weight:bold; border-radius:50px; display:inline-block; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">Chat with DCF Sales Bot</a>
+    <a href="https://t.me/DCF_sales_bot" target="_blank" class="btn">DCF SALES BOT</a>
 </div>
 
 <script>
-    let scene, camera, renderer, ball, hoop, court;
-    let score = 0;
-    let isShooting = false;
-    let velocity = new THREE.Vector3();
+let scene, camera, renderer, ball, hoop, court;
+let score = 0;
+let isShooting = false;
+let velocity = new THREE.Vector3();
 
-    function init() {
-        scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x0a0a0a);
-        camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-        
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+function init() {
+    scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x0a0a0a);
+    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
-        // Professional 3D Basketball
-        const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
-        const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500, shininess: 80 });
-        ball = new THREE.Mesh(ballGeo, ballMat);
-        ball.position.set(0, 1, 6);
-        scene.add(ball);
+    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
-        // 3D Court Floor
-        const courtGeo = new THREE.PlaneGeometry(20, 40);
-        const courtMat = new THREE.MeshPhongMaterial({ color: 0x222222 });
-        court = new THREE.Mesh(courtGeo, courtMat);
-        court.rotation.x = -Math.PI / 2;
-        scene.add(court);
+    const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
+    const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500, shininess: 80 });
+    ball = new THREE.Mesh(ballGeo, ballMat);
+    scene.add(ball);
 
-        // The Hoop
-        const hoopGeo = new THREE.TorusGeometry(0.7, 0.05, 16, 100);
-        const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
-        hoop = new THREE.Mesh(hoopGeo, hoopMat);
-        hoop.position.set(0, 5, -8);
-        hoop.rotation.x = Math.PI / 2;
-        scene.add(hoop);
+    const courtGeo = new THREE.PlaneGeometry(20, 40);
+    const courtMat = new THREE.MeshPhongMaterial({ color: 0x222222, side: THREE.DoubleSide });
+    court = new THREE.Mesh(courtGeo, courtMat);
+    court.rotation.x = -Math.PI / 2;
+    scene.add(court);
 
-        // Lighting (Makes it look real)
-        const light = new THREE.PointLight(0xffffff, 1.2, 100);
-        light.position.set(5, 10, 10);
-        scene.add(light);
-        scene.add(new THREE.AmbientLight(0x404040));
+    const hoopGeo = new THREE.TorusGeometry(0.8, 0.08, 16, 100);
+    const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    hoop = new THREE.Mesh(hoopGeo, hoopMat);
+    hoop.position.set(0, 6, -10);
+    hoop.rotation.x = Math.PI / 2;
+    scene.add(hoop);
 
-        camera.position.set(0, 4, 15);
-        camera.lookAt(0, 3, 0);
+    const light = new THREE.PointLight(0xffffff, 1.5, 100);
+    light.position.set(5, 10, 10);
+    scene.add(light);
+    scene.add(new THREE.AmbientLight(0x404040));
 
-        animate();
-    }
+    camera.position.set(0, 5, 10);
+    camera.lookAt(0, 4, -5);
 
-    function animate() {
-        requestAnimationFrame(animate);
-        if (isShooting) {
-            ball.position.add(velocity);
-            velocity.y -= 0.009; // Real Gravity
-            ball.rotation.x += 0.1; // Professional Spin
+    resetBall();
 
-            if (ball.position.y < 0.5) resetBall();
-            
-            if (ball.position.distanceTo(hoop.position) < 0.8) {
-                score++;
-                document.getElementById('score').innerText = "BUCKETS: " + score;
-                resetBall();
-            }
+    window.addEventListener('mousedown', shoot);
+    window.addEventListener('touchstart', (e) => { e.preventDefault(); shoot(); }, { passive: false });
+
+    animate();
+}
+
+function shoot() {
+    if (isShooting) return;
+    isShooting = true;
+    velocity.set(0, 0.18, -0.25);
+}
+
+function animate() {
+    requestAnimationFrame(animate);
+    
+    if (isShooting) {
+        ball.position.add(velocity);
+        velocity.y -= 0.006;
+        ball.rotation.x += 0.1;
+
+        let dist = ball.position.distanceTo(new THREE.Vector3(0, 6, -10));
+        if (dist < 0.8) {
+            score++;
+            document.getElementById('score').innerText = "BUCKETS: " + score;
+            resetBall();
         }
-        renderer.render(scene, camera);
+
+        if (ball.position.y < 0.5) resetBall();
     }
 
-    function resetBall() {
-        isShooting = false;
-        ball.position.set(0, 1, 6);
-        velocity.set(0, 0, 0);
-    }
+    renderer.render(scene, camera);
+}
 
-    window.addEventListener('touchstart', () => {
-        if (!isShooting) {
-            isShooting = true;
-            velocity.set(0, 0.28, -0.25); // Pro Launch Power
-        }
-    });
+function resetBall() {
+    isShooting = false;
+    ball.position.set(0, 1, 5);
+    velocity.set(0, 0, 0);
+}
 
-    init();
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
+
+init();
 </script>
 </body>
 </html>
