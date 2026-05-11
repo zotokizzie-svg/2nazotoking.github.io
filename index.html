@@ -1,15 +1,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>DCF 3x3 TOURNAMENT</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        body { margin: 0; overflow: hidden; background-image: url('https://images.unsplash.com/photo-1544919982-b61976f0ba43?q=80&w=1000'); background-size: cover; background-position: center;
-: #000; font-family: 'Arial Black', sans-serif; }
+        body { margin: 0; overflow: hidden; background-color: #000; font-family: 'Arial Black', sans-serif; }
         #ui { position: absolute; top: 10px; width: 100%; text-align: center; color: #fff; pointer-events: none; }
         .stats { font-size: 20px; color: #ffcc00; text-shadow: 2px 2px #000; }
-        .venue-btn { position: absolute; top: 10px; right: 10px; padding: 10px; background: #ED174C; color: #fff; border: none; cursor: pointer; border-radius: 5px; pointer-events: auto; }
+        .venue-btn { position: absolute; top: 10px; right: 10px; padding: 10px; background: #ED174C; color: #fff; border: none; font-weight: bold; cursor: pointer; pointer-events: auto; }
         #controls { position: absolute; bottom: 20px; width: 100%; text-align: center; color: #fff; font-size: 12px; }
     </style>
 </head>
@@ -23,13 +21,17 @@
 <button class="venue-btn" onclick="switchVenue()">SWITCH VENUE</button>
 
 <div id="controls">TAP SCREEN TO CROSSOVER & SHOOT</div>
+<div id="gold-ui" style="position: absolute; top: 60px; left: 10px; color: #FFD700; font-size: 18px; text-shadow: 2px 2px #000; z-index: 100;">GOLD: <span id="gold-count">0</span></div>
+<button id="store-btn" onclick="toggleStore()" style="position: absolute; top: 90px; left: 10px; background: #FFD700; color: #000; border: none; padding: 5px 10px; font-weight: bold; border-radius: 5px; z-index: 100;">DCF STORE</button>
 
 <script>
+let goldCoins = 0;
+let unlockedPlayers = ['YOU'];
 let scene, camera, renderer, ball, hoop, court, textureLoader;
 let score = 0, timeLeft = 60, isShooting = false;
 let velocity = new THREE.Vector3();
 let players = [];
-let currentVenue = 0; // 0: Street, 1: Beach
+let currentVenue = 0;
 
 const venues = [
     { name: "Street", floor: 0x333333, ambient: 0x404040 },
@@ -39,44 +41,38 @@ const venues = [
 function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-            renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
-        renderer.setClearColor(0x000000, 0); 
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+    renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setClearColor(0x000000, 0);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    document.body.appendChild(renderer.domElement);
 
     textureLoader = new THREE.TextureLoader();
 
-    // Lighting
     const sun = new THREE.DirectionalLight(0xffffff, 1.2);
     sun.position.set(5, 10, 7);
     scene.add(sun);
-    scene.add(new THREE.AmbientLight(venues[currentVenue].ambient));
+    scene.add(new THREE.AmbientLight(venues[currentVenue].ambient, 1));
 
-    // Court
     const floorGeo = new THREE.PlaneGeometry(30, 60);
-    const floorMat = new THREE.MeshBasicMaterial({ visible: false });
-
+    const floorMat = new THREE.MeshBasicMaterial({ color: venues[currentVenue].floor });
     court = new THREE.Mesh(floorGeo, floorMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
-    // Basketball
     const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
     const ballMat = new THREE.MeshPhongMaterial({ color: 0xff4500 });
     ball = new THREE.Mesh(ballGeo, ballMat);
     scene.add(ball);
 
-    // The Hoop
     const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
-    hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    hoop.position.set(0, 6, -15);
-    hoop.rotation.x = Math.PI / 2;
+    const hoopMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+    hoop = new THREE.Mesh(hoopGeo, hoopMat);
+    hoop.position.set(0, 8, -15);
     scene.add(hoop);
 
-    // Create 3-on-3 Players (Billboards)
-    createPlayer(0, 3, -5, "YOU (2NA ZOTO)"); // Captain
-    createPlayer(-4, 2, -10, "DEFENDER 1");   // Jay-Z
-    createPlayer(4, 2, -10, "DEFENDER 2"); 
+    createPlayer(0, 3, -5, "YOU (2NA ZOTO)");
+    createPlayer(-4, 2, -10, "LEBRON");
+    createPlayer(4, 2, -10, "THE ANSWER");
 
     camera.position.set(0, 6, 12);
     camera.lookAt(0, 4, -5);
@@ -84,25 +80,29 @@ function init() {
     resetBall();
     window.addEventListener('touchstart', shoot);
     window.addEventListener('mousedown', shoot);
-    
     startTimer();
     animate();
 }
 
 function createPlayer(x, y, z, label) {
-    // In a real version, you'd use textureLoader.load('your_image.png')
     const playerGeo = new THREE.PlaneGeometry(3, 5);
-    const playerMat = new THREE.MeshLambertMaterial({ color: 0x888888, side: THREE.DoubleSide, transparent: true, opacity: 0.8 });
-    const player = new THREE.Mesh(playerGeo, playerMat);
-    player.position.set(x, 2.5, z);
-    scene.add(player);
-    players.push(player);
+    const playerMat = new THREE.MeshBasicMaterial({ color: 0x555555, side: THREE.DoubleSide });
+    const p = new THREE.Mesh(playerGeo, playerMat);
+    p.position.set(x, y, z);
+    scene.add(p);
+    players.push(p);
 }
 
-function switchVenue() {
-    currentVenue = (currentVenue + 1) % venues.length;
-    court.material.color.setHex(venues[currentVenue].floor);
-    alert("Moving to " + venues[currentVenue].name + " Court!");
+function shoot() {
+    if (isShooting || timeLeft <= 0) return;
+    isShooting = true;
+    velocity.set(0, 0.2, -0.3);
+}
+
+function resetBall() {
+    isShooting = false;
+    ball.position.set(0, 1.5, 6);
+    velocity.set(0, 0, 0);
 }
 
 function startTimer() {
@@ -114,38 +114,30 @@ function startTimer() {
     }, 1000);
 }
 
-function shoot() {
-    if (isShooting || timeLeft <= 0) return;
-    isShooting = true;
-    velocity.set(0, 0.19, -0.28);
-}
-
 function animate() {
     requestAnimationFrame(animate);
     if (isShooting) {
         ball.position.add(velocity);
-        velocity.y -= 0.007; 
-        
-        let dist = ball.position.distanceTo(new THREE.Vector3(0, 6, -15));
+        velocity.y -= 0.007;
+        let dist = ball.position.distanceTo(new THREE.Vector3(0, 8, -15));
         if (dist < 0.8) {
             score += 2;
+            goldCoins += 50;
+            document.getElementById('gold-count').innerText = goldCoins;
             resetBall();
         }
         if (ball.position.y < 0.5) resetBall();
     }
-    
-    // Make players "breathe" or move slightly
-    players.forEach((p, i) => {
-        p.position.x += Math.sin(Date.now() * 0.002 + i) * 0.01;
-    });
-
     renderer.render(scene, camera);
 }
 
-function resetBall() {
-    isShooting = false;
-    ball.position.set(0, 1.5, 6);
-    velocity.set(0,0,0);
+function switchVenue() {
+    currentVenue = (currentVenue + 1) % venues.length;
+    location.reload(); 
+}
+
+function toggleStore() {
+    alert("DCF GLOBAL STORE: Earn 500 Gold to unlock Musicians and Legends!");
 }
 
 init();
