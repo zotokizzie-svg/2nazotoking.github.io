@@ -5,6 +5,7 @@
     <title>DCF WORLD TOUR 3x3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
+        /* UI and Styling based on 1000133568.jpg and 1000133567.jpg */
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
         #ui-layer { position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .hud-text { color: #fff; text-shadow: 2px 2px #000; position: absolute; }
@@ -23,8 +24,8 @@
 
 <script>
 /** 
- * DCF WORLD TOUR - CORE ENGINE
- * Reference: 1000133903.jpg
+ * DCF WORLD TOUR - COMPLETE STABLE BUILD
+ * Reference: 1000133904.jpg
  **/
 
 const GameConfig = {
@@ -45,21 +46,25 @@ function initWorld() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
+    // Lighting (Ref: 1000133904.jpg)
     const light = new THREE.DirectionalLight(0xffffff, 1.2);
     light.position.set(5, 10, 7);
     scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
 
+    // Court Construction (Fixed "fleeer" typo)
     const courtGeo = new THREE.PlaneGeometry(30, 60);
     const courtMat = new THREE.MeshPhongMaterial({ color: GameConfig.colors.floor });
     const court = new THREE.Mesh(courtGeo, courtMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
+    // Goal (Fixed "haopGeo" typo)
     const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
     hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     hoop.position.set(0, 8, -15);
     scene.add(hoop);
 
+    // Ball Position (Ref: 1000133568.jpg)
     const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
     ball = new THREE.Mesh(ballGeo, new THREE.MeshPhongMaterial({ color: 0xFF5700 }));
     ball.position.set(0, 1, 8);
@@ -69,6 +74,7 @@ function initWorld() {
     camera.lookAt(0, 2, -5);
 }
 
+// Rival Spawning Logic (Nas & Jay-Z)
 function spawnRival(name, xPos) {
     const rivalGeo = new THREE.BoxGeometry(1.5, 4, 1);
     const rivalMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
@@ -82,14 +88,17 @@ initWorld();
 const nas = spawnRival("NAS", -4);
 const jayz = spawnRival("JAY-Z", 4);
 
+/**
+ * REPLAY & SLOW MOTION SYSTEM
+ **/
 function handleReplaySystem() {
     if (isReplaying) return;
     
-    // Record movement
+    // Record current ball path
     replayBuffer.push(ball.position.clone());
     if (replayBuffer.length > BUFFER_SIZE) replayBuffer.shift();
 
-    // Score Detection
+    // Trigger Replay when scored
     if (ball.position.distanceTo(hoop.position) < 0.6) {
         startSlowMoReplay();
     }
@@ -99,7 +108,7 @@ function startSlowMoReplay() {
     isReplaying = true;
     let frame = 0;
     
-    // Highlight Camera Angle
+    // Switch to Cinematic Highlight Camera
     camera.position.set(5, 8, -12); 
     camera.lookAt(hoop.position);
 
@@ -111,33 +120,39 @@ function startSlowMoReplay() {
             clearInterval(playback);
             finalizeReplay();
         }
-    }, 60); // 60ms delay for Slow-Mo
+    }, 60); // 60ms makes it Slow Motion
 }
 
 function finalizeReplay() {
     isReplaying = false;
     replayBuffer = [];
     ball.position.set(0, 1, 8); // Reset Ball
+    
+    // Return Camera to original play view (Ref: 1000133904.jpg)
     camera.position.set(0, 6, 14);
     camera.lookAt(0, 2, -5);
 }
 
+// MAIN ANIMATION ENGINE
 function animate() {
     requestAnimationFrame(animate);
 
     if (!isReplaying) {
-        // Normal Legend Movement
+        // Move Nas and Jay-Z only during live play
         nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
         jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
+        
         handleReplaySystem();
     }
 
     renderer.render(scene, camera);
 }
 
+// Start the Game
 animate();
 </script>
 </body>
 </html>
+
 
 
