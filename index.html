@@ -5,7 +5,6 @@
     <title>DCF WORLD TOUR 3x3</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* UI and Styling as seen in 1000133568.jpg and 1000133567.jpg */
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
         #ui-layer { position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
         .hud-text { color: #fff; text-shadow: 2px 2px #000; position: absolute; }
@@ -24,16 +23,20 @@
 
 <script>
 /** 
- * CORE GAME ENGINE 
- * Reference: 1000133567.jpg
+ * DCF WORLD TOUR - CORE ENGINE
+ * Reference: 1000133903.jpg
  **/
+
 const GameConfig = {
     gold: 0,
     venue: "GHANA 🇬🇭",
     colors: { floor: 0x006B3F, ambient: 0xffffff }
 };
 
-let isReplaying = false; // Add this near your other 'let' variables
+let scene, camera, renderer, ball, hoop;
+let isReplaying = false; 
+let replayBuffer = [];
+const BUFFER_SIZE = 90;
 
 function initWorld() {
     scene = new THREE.Scene();
@@ -42,25 +45,21 @@ function initWorld() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lighting
     const light = new THREE.DirectionalLight(0xffffff, 1.2);
     light.position.set(5, 10, 7);
     scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
 
-    // Court Construction
     const courtGeo = new THREE.PlaneGeometry(30, 60);
     const courtMat = new THREE.MeshPhongMaterial({ color: GameConfig.colors.floor });
     const court = new THREE.Mesh(courtGeo, courtMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
-    // Goal
     const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
     hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
     hoop.position.set(0, 8, -15);
     scene.add(hoop);
 
-    // Initial Ball Position (Ref: 1000133568.jpg)
     const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
     ball = new THREE.Mesh(ballGeo, new THREE.MeshPhongMaterial({ color: 0xFF5700 }));
     ball.position.set(0, 1, 8);
@@ -70,47 +69,27 @@ function initWorld() {
     camera.lookAt(0, 2, -5);
 }
 
-// LEGEND DEFENDER LOGIC (Nas / Jay-Z)
 function spawnRival(name, xPos) {
     const rivalGeo = new THREE.BoxGeometry(1.5, 4, 1);
     const rivalMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
     const rival = new THREE.Mesh(rivalGeo, rivalMat);
     rival.position.set(xPos, 2, -10);
-    rival.userData = { name: name };
     scene.add(rival);
     return rival;
 }
 
 initWorld();
-
-// Spawn the Legends
 const nas = spawnRival("NAS", -4);
 const jayz = spawnRival("JAY-Z", 4);
 
-function animate() {
-    requestAnimationFrame(animate);
-
-    if (!isReplaying) {
-        // Nas and Jay-Z move only when game is live
-        nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
-        jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
-        
-        // This is what starts the replay when you score
-        handleReplaySystem(); 
-    }
-
-    renderer.render(scene, camera);
-}
-
-animate();
-</script>// --- PASTE THIS AT LINE 99 ---
-let replayBuffer = [];
-const BUFFER_SIZE = 90; 
-
 function handleReplaySystem() {
     if (isReplaying) return;
+    
+    // Record movement
     replayBuffer.push(ball.position.clone());
     if (replayBuffer.length > BUFFER_SIZE) replayBuffer.shift();
+
+    // Score Detection
     if (ball.position.distanceTo(hoop.position) < 0.6) {
         startSlowMoReplay();
     }
@@ -119,8 +98,11 @@ function handleReplaySystem() {
 function startSlowMoReplay() {
     isReplaying = true;
     let frame = 0;
+    
+    // Highlight Camera Angle
     camera.position.set(5, 8, -12); 
     camera.lookAt(hoop.position);
+
     const playback = setInterval(() => {
         if (frame < replayBuffer.length) {
             ball.position.copy(replayBuffer[frame]);
@@ -129,17 +111,33 @@ function startSlowMoReplay() {
             clearInterval(playback);
             finalizeReplay();
         }
-    }, 60); 
+    }, 60); // 60ms delay for Slow-Mo
 }
 
 function finalizeReplay() {
     isReplaying = false;
     replayBuffer = [];
-    resetBall(); 
+    ball.position.set(0, 1, 8); // Reset Ball
     camera.position.set(0, 6, 14);
     camera.lookAt(0, 2, -5);
 }
 
+function animate() {
+    requestAnimationFrame(animate);
+
+    if (!isReplaying) {
+        // Normal Legend Movement
+        nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
+        jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
+        handleReplaySystem();
+    }
+
+    renderer.render(scene, camera);
+}
+
+animate();
+</script>
 </body>
 </html>
+
 
