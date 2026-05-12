@@ -89,12 +89,19 @@ const jayz = spawnRival("JAY-Z", 4);
 
 function animate() {
     requestAnimationFrame(animate);
-    // Add subtle defender movement here
-    nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
-    jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
-    
+
+    if (!isReplaying) {
+        // Nas and Jay-Z move only when game is live
+        nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
+        jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
+        
+        // This is what starts the replay when you score
+        handleReplaySystem(); 
+    }
+
     renderer.render(scene, camera);
 }
+
 animate();
 </script>// --- PASTE THIS AT LINE 99 ---
 let replayBuffer = [];
