@@ -33,7 +33,7 @@ const GameConfig = {
     colors: { floor: 0x006B3F, ambient: 0xffffff }
 };
 
-let scene, camera, renderer, ball, hoop;
+let isReplaying = false; // Add this near your other 'let' variables
 
 function initWorld() {
     scene = new THREE.Scene();
@@ -96,7 +96,43 @@ function animate() {
     renderer.render(scene, camera);
 }
 animate();
-</script>
+</script>// --- PASTE THIS AT LINE 99 ---
+let replayBuffer = [];
+const BUFFER_SIZE = 90; 
+
+function handleReplaySystem() {
+    if (isReplaying) return;
+    replayBuffer.push(ball.position.clone());
+    if (replayBuffer.length > BUFFER_SIZE) replayBuffer.shift();
+    if (ball.position.distanceTo(hoop.position) < 0.6) {
+        startSlowMoReplay();
+    }
+}
+
+function startSlowMoReplay() {
+    isReplaying = true;
+    let frame = 0;
+    camera.position.set(5, 8, -12); 
+    camera.lookAt(hoop.position);
+    const playback = setInterval(() => {
+        if (frame < replayBuffer.length) {
+            ball.position.copy(replayBuffer[frame]);
+            frame++;
+        } else {
+            clearInterval(playback);
+            finalizeReplay();
+        }
+    }, 60); 
+}
+
+function finalizeReplay() {
+    isReplaying = false;
+    replayBuffer = [];
+    resetBall(); 
+    camera.position.set(0, 6, 14);
+    camera.lookAt(0, 2, -5);
+}
+
 </body>
 </html>
 
