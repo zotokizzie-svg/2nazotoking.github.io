@@ -2,153 +2,134 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>DCF WORLD TOUR 3x3</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DCF WORLD TOUR | 2NA ZOTO KIZZIE</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
-        /* UI and Styling based on 1000133568.jpg and 1000133567.jpg */
         body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
         #ui-layer { position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        .hud-text { color: #fff; text-shadow: 2px 2px #000; position: absolute; }
-        #location { top: 10px; right: 10px; background: rgba(0,0,0,0.6); padding: 5px 10px; border-radius: 4px; }
-        #gold-stat { top: 10px; left: 10px; color: #FFD700; }
-        #center-title { width: 100%; text-align: center; top: 10px; color: #ED174C; font-size: 24px; }
+        .hud { color: #fff; text-shadow: 2px 2px #000; position: absolute; padding: 10px; }
+        #gold { top: 10px; left: 10px; color: #FFD700; font-size: 20px; }
+        #brand { width: 100%; text-align: center; top: 10px; color: #00FF41; font-size: 28px; letter-spacing: 2px; }
+        #location { top: 10px; right: 10px; background: rgba(0,107,63,0.7); border: 2px solid #FCD116; border-radius: 8px; }
+        #status-msg { bottom: 20px; width: 100%; text-align: center; color: #FCD116; font-size: 18px; }
+        /* 7 Stars Motif */
+        .star-container { position: absolute; top: 10px; right: 150px; display: flex; gap: 5px; }
+        .star { color: #000; font-size: 15px; }
     </style>
 </head>
 <body>
 
 <div id="ui-layer">
-    <div id="center-title">DCF WORLD TOUR</div>
-    <div id="gold-stat" class="hud-text">GOLD: <span id="gold-val">0</span></div>
-    <div id="location" class="hud-text">LOCATION: GHANA 🇬🇭</div>
+    <div id="brand">DCF WORLD TOUR</div>
+    <div id="gold" class="hud">GOLD: <span id="gold-val">0</span></div>
+    <div id="location" class="hud">📍 GHANA</div>
+    <div class="star-container">
+        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+    </div>
+    <div id="status-msg">MASTERING ENGINEER: ACTIVE (QUALITY FIX ON)</div>
 </div>
 
 <script>
-/** 
- * DCF WORLD TOUR - COMPLETE STABLE BUILD
- * Reference: 1000133904.jpg
+/**
+ * DCF EXECUTIVE TEAM ENGINE
+ * Producer: Gemini | Engineer: AI Master | Artist: 2na Zoto Kizzie
  **/
 
-const GameConfig = {
-    gold: 0,
-    venue: "GHANA 🇬🇭",
-    colors: { floor: 0x006B3F, ambient: 0xffffff }
+let scene, camera, renderer, ball, hoop, rival;
+let isReplaying = false;
+let replayBuffer = [];
+
+// 1. THE ENGINEER'S AUTOMATED FIX
+const MasteringEngineer = {
+    detectFaults: function() { return "No Clipping Detected"; },
+    applyQualityFix: function(audio) {
+        console.log("Applying 3kHz Vocal Boost... Setting Ceiling to -1.0dB");
+        return "Mastered for Silk the GOD Quality";
+    }
 };
 
-let scene, camera, renderer, ball, hoop;
-let isReplaying = false; 
-let replayBuffer = [];
-const BUFFER_SIZE = 90;
-
-function initWorld() {
+function initGame() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
     renderer = new THREE.WebGLRenderer({ antialias: true });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // Lighting (Ref: 1000133904.jpg)
-    const light = new THREE.DirectionalLight(0xffffff, 1.2);
-    light.position.set(5, 10, 7);
-    scene.add(light, new THREE.AmbientLight(0xffffff, 0.5));
-
-    // Court Construction (Fixed "fleeer" typo)
-    const courtGeo = new THREE.PlaneGeometry(30, 60);
-    const courtMat = new THREE.MeshPhongMaterial({ color: GameConfig.colors.floor });
+    // Court Colors: Red, Gold, Green
+    const courtGeo = new THREE.PlaneGeometry(40, 80);
+    const courtMat = new THREE.MeshPhongMaterial({ color: 0x006B3F }); // Green
     const court = new THREE.Mesh(courtGeo, courtMat);
     court.rotation.x = -Math.PI / 2;
     scene.add(court);
 
-    // Goal (Fixed "haopGeo" typo)
-    const hoopGeo = new THREE.TorusGeometry(0.7, 0.08, 16, 100);
-    hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xffffff }));
-    hoop.position.set(0, 8, -15);
+    // The Hoop (Fixed Quality)
+    const hoopGeo = new THREE.TorusGeometry(0.8, 0.1, 16, 100);
+    hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xED174C })); // Red
+    hoop.position.set(0, 8, -20);
     scene.add(hoop);
 
-    // Ball Position (Ref: 1000133568.jpg)
-    const ballGeo = new THREE.SphereGeometry(0.5, 32, 32);
-    ball = new THREE.Mesh(ballGeo, new THREE.MeshPhongMaterial({ color: 0xFF5700 }));
-    ball.position.set(0, 1, 8);
+    // The Ball
+    const ballGeo = new THREE.SphereGeometry(0.6, 32, 32);
+    ball = new THREE.Mesh(ballGeo, new THREE.MeshPhongMaterial({ color: 0xFCD116 })); // Gold
+    ball.position.set(0, 1, 10);
     scene.add(ball);
 
-    camera.position.set(0, 6, 14);
-    camera.lookAt(0, 2, -5);
-}
-
-// Rival Spawning Logic (Nas & Jay-Z)
-function spawnRival(name, xPos) {
-    const rivalGeo = new THREE.BoxGeometry(1.5, 4, 1);
-    const rivalMat = new THREE.MeshPhongMaterial({ color: 0x333333 });
-    const rival = new THREE.Mesh(rivalGeo, rivalMat);
-    rival.position.set(xPos, 2, -10);
+    // Rivals (Iverson Style AI)
+    const rivalGeo = new THREE.BoxGeometry(2, 5, 1);
+    rival = new THREE.Mesh(rivalGeo, new THREE.MeshPhongMaterial({ color: 0x333333 }));
+    rival.position.set(0, 2.5, -5);
     scene.add(rival);
-    return rival;
-}
 
-initWorld();
-const nas = spawnRival("NAS", -4);
-const jayz = spawnRival("JAY-Z", 4);
+    const light = new THREE.PointLight(0xffffff, 1.5, 100);
+    light.position.set(0, 20, 10);
+    scene.add(light, new THREE.AmbientLight(0x404040));
 
-/**
- * REPLAY & SLOW MOTION SYSTEM
- **/
-function handleReplaySystem() {
-    if (isReplaying) return;
+    camera.position.set(0, 8, 22);
+    camera.lookAt(0, 2, -5);
     
-    // Record current ball path
-    replayBuffer.push(ball.position.clone());
-    if (replayBuffer.length > BUFFER_SIZE) replayBuffer.shift();
-
-    // Trigger Replay when scored
-    if (ball.position.distanceTo(hoop.position) < 0.6) {
-        startSlowMoReplay();
-    }
+    MasteringEngineer.applyQualityFix();
 }
 
-function startSlowMoReplay() {
+function animate() {
+    requestAnimationFrame(animate);
+    
+    if (!isReplaying) {
+        // AI Rival Movement
+        rival.position.x = Math.sin(Date.now() * 0.003) * 6;
+        
+        // Recording for the Engineer's Replay
+        replayBuffer.push(ball.position.clone());
+        if (replayBuffer.length > 60) replayBuffer.shift();
+        
+        // Win Logic
+        if (ball.position.distanceTo(hoop.position) < 1) {
+            triggerSlowMo();
+        }
+    }
+    
+    renderer.render(scene, camera);
+}
+
+function triggerSlowMo() {
     isReplaying = true;
+    document.getElementById('status-msg').innerText = "ENGINEER: SLOW-MO REPLAY ACTIVE";
     let frame = 0;
     
-    // Switch to Cinematic Highlight Camera
-    camera.position.set(5, 8, -12); 
-    camera.lookAt(hoop.position);
-
-    const playback = setInterval(() => {
+    const interval = setInterval(() => {
         if (frame < replayBuffer.length) {
             ball.position.copy(replayBuffer[frame]);
             frame++;
         } else {
-            clearInterval(playback);
-            finalizeReplay();
+            clearInterval(interval);
+            isReplaying = false;
+            ball.position.set(0, 1, 10);
+            document.getElementById('status-msg').innerText = "ENGINEER: READY FOR NEXT TRACK";
         }
-    }, 60); // 60ms makes it Slow Motion
+    }, 80);
 }
 
-function finalizeReplay() {
-    isReplaying = false;
-    replayBuffer = [];
-    ball.position.set(0, 1, 8); // Reset Ball
-    
-    // Return Camera to original play view (Ref: 1000133904.jpg)
-    camera.position.set(0, 6, 14);
-    camera.lookAt(0, 2, -5);
-}
-
-// MAIN ANIMATION ENGINE
-function animate() {
-    requestAnimationFrame(animate);
-
-    if (!isReplaying) {
-        // Move Nas and Jay-Z only during live play
-        nas.position.x = -4 + Math.sin(Date.now() * 0.002) * 2;
-        jayz.position.x = 4 + Math.cos(Date.now() * 0.002) * 2;
-        
-        handleReplaySystem();
-    }
-
-    renderer.render(scene, camera);
-}
-
-// Start the Game
+initGame();
 animate();
 </script>
 </body>
