@@ -1,139 +1,133 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DCF WORLD TOUR | 2NA ZOTO KIZZIE</title>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-    <style>
-        body { margin: 0; overflow: hidden; background: #000; font-family: 'Arial Black', sans-serif; }
-        #ui-layer { position: absolute; top: 0; width: 100%; height: 100%; pointer-events: none; z-index: 10; }
-        .hud { color: #fff; text-shadow: 2px 2px #000; position: absolute; padding: 10px; }
-        #gold { top: 10px; left: 10px; color: #FFD700; font-size: 20px; }
-        #brand { width: 100%; text-align: center; top: 10px; color: #00FF41; font-size: 28px; letter-spacing: 2px; }
-        #location { top: 10px; right: 10px; background: rgba(0,107,63,0.7); border: 2px solid #FCD116; border-radius: 8px; }
-        #status-msg { bottom: 20px; width: 100%; text-align: center; color: #FCD116; font-size: 18px; }
-        /* 7 Stars Motif */
-        .star-container { position: absolute; top: 10px; right: 150px; display: flex; gap: 5px; }
-        .star { color: #000; font-size: 15px; }
-    </style>
-</head>
-<body>
+<!-- Worldwide Store & Crypto Payment Section -->
+<section id="worldwide-store" style="background: #111; color: #fff; padding: 60px 20px; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+    <div style="max-width: 1200px; margin: 0 auto;">
+        
+        <!-- Section Heading with Flag Colors & Black Star Theme -->
+        <h2 style="font-size: 2.5rem; color: #FFCC00; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">
+            Worldwide Management & Digital Store
+        </h2>
+        <p style="color: #009B4F; font-size: 1.2rem; margin-bottom: 40px; font-weight: bold;">
+            ★ Secure International Bookings, Music Sales & Digital Assets ★
+        </p>
 
-<div id="ui-layer">
-    <div id="brand">DCF WORLD TOUR</div>
-    <div id="gold" class="hud">GOLD: <span id="gold-val">0</span></div>
-    <div id="location" class="hud">📍 GHANA</div>
-    <div class="star-container">
-        <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+        <!-- Main Store Grid -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 50px;">
+            
+            <!-- Item 1: Audio / Track Download -->
+            <div style="background: #222; border: 2px solid #FF3333; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <h3 style="color: #fff; margin-top: 0;">Global Audio Streaming / License</h3>
+                <p style="color: #aaa; font-size: 0.9rem;">Get broadcast-ready wav files & international commercial distribution rights.</p>
+                <div style="font-size: 1.5rem; color: #FFCC00; margin: 20px 0; font-weight: bold;">$19.99</div>
+                <button onclick="openPaymentModal('Audio License', 19.99)" style="background: #009B4F; color: #fff; border: none; padding: 12px 25px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; text-transform: uppercase;">
+                    Buy Now
+                </button>
+            </div>
+
+            <!-- Item 2: Artist Performance / Booking -->
+            <div style="background: #222; border: 2px solid #FFCC00; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
+                <h3 style="color: #fff; margin-top: 0;">International Booking Deposit</h3>
+                <p style="color: #aaa; font-size: 0.9rem;">Secure show bookings, feature verses, and global festival appearances.</p>
+                <div style="font-size: 1.5rem; color: #FFCC00; margin: 20px 0; font-weight: bold;">$500.00</div>
+                <button onclick="openPaymentModal('Booking Deposit', 500.00)" style="background: #FFCC00; color: #000; border: none; padding: 12px 25px; font-weight: bold; border-radius: 4px; cursor: pointer; width: 100%; text-transform: uppercase;">
+                    Book Now
+                </button>
+            </div>
+
+        </div>
+
+        <!-- Integrated Payment Gateways (Fiat + Crypto) -->
+        <div style="background: #1a1a1a; padding: 30px; border-radius: 10px; border: 1px solid #333; max-width: 600px; margin: 0 auto;">
+            <h4 style="margin-top: 0; color: #fff; font-size: 1.3rem; margin-bottom: 20px;">Select Your Secure Gateway</h4>
+            
+            <div style="display: flex; flex-direction: column; gap: 15px;">
+                <!-- Traditional Fiat Gateways -->
+                <div style="display: flex; gap: 10px;">
+                    <button onclick="processFiat('Paystack')" style="flex: 1; background: #00a3e0; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer;">
+                        Pay with Paystack (MoMo / Card)
+                    </button>
+                    <button onclick="processFiat('Flutterwave')" style="flex: 1; background: #fb4e4e; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer;">
+                        Pay with Flutterwave
+                    </button>
+                </div>
+
+                <!-- NEW: Crypto & Bitcoin Gateway Integration -->
+                <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 5px;">
+                    <p style="color: #FFCC00; font-size: 0.9rem; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
+                        ⚡ Pay Anonymously with Crypto ⚡
+                    </p>
+                    <button onclick="processCrypto('BTC')" style="width: 100%; background: #f7931a; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
+                        <span>₿</span> Pay with Bitcoin (BTC)
+                    </button>
+                    <button onclick="processCrypto('USDT')" style="width: 100%; background: #26a17b; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 1rem;">
+                        Pay with USDT (Tether)
+                    </button>
+                </div>
+            </div>
+        </div>
+
     </div>
-    <div id="status-msg">MASTERING ENGINEER: ACTIVE (QUALITY FIX ON)</div>
-</div>
+</section>
 
+<!-- Gateway Logic Scripts & Telegram Notification System -->
 <script>
-/**
- * DCF EXECUTIVE TEAM ENGINE
- * Producer: Gemini | Engineer: AI Master | Artist: 2na Zoto Kizzie
- **/
+    let currentItem = '';
+    let currentPrice = 0;
 
-let scene, camera, renderer, ball, hoop, rival;
-let isReplaying = false;
-let replayBuffer = [];
-
-// 1. THE ENGINEER'S AUTOMATED FIX
-const MasteringEngineer = {
-    detectFaults: function() { return "No Clipping Detected"; },
-    applyQualityFix: function(audio) {
-        console.log("Applying 3kHz Vocal Boost... Setting Ceiling to -1.0dB");
-        return "Mastered for Silk the GOD Quality";
+    function openPaymentModal(itemName, itemPrice) {
+        currentItem = itemName;
+        currentPrice = itemPrice;
+        alert("Selected: " + itemName + " - $" + itemPrice + "\nPlease choose a payment gateway below.");
     }
-};
 
-function initGame() {
-    scene = new THREE.Scene();
-    camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    renderer = new THREE.WebGLRenderer({ antialias: true });
-    renderer.setSize(window.innerWidth, window.innerHeight);
-    document.body.appendChild(renderer.domElement);
+    function processFiat(provider) {
+        if (!currentItem) {
+            alert("Please select an item from the store first!");
+            return;
+        }
+        alert("Redirecting to " + provider + " secure gateway to process $" + currentPrice + " for " + currentItem);
+        // Instant Telegram Log Trigger
+        sendTelegramNotification(provider, currentItem, currentPrice, "Pending Fiat Verification");
+    }
 
-    // Court Colors: Red, Gold, Green
-    const courtGeo = new THREE.PlaneGeometry(40, 80);
-    const courtMat = new THREE.MeshPhongMaterial({ color: 0x006B3F }); // Green
-    const court = new THREE.Mesh(courtGeo, courtMat);
-    court.rotation.x = -Math.PI / 2;
-    scene.add(court);
-
-    // The Hoop (Fixed Quality)
-    const hoopGeo = new THREE.TorusGeometry(0.8, 0.1, 16, 100);
-    hoop = new THREE.Mesh(hoopGeo, new THREE.MeshBasicMaterial({ color: 0xED174C })); // Red
-    hoop.position.set(0, 8, -20);
-    scene.add(hoop);
-
-    // The Ball
-    const ballGeo = new THREE.SphereGeometry(0.6, 32, 32);
-    ball = new THREE.Mesh(ballGeo, new THREE.MeshPhongMaterial({ color: 0xFCD116 })); // Gold
-    ball.position.set(0, 1, 10);
-    scene.add(ball);
-
-    // Rivals (Iverson Style AI)
-    const rivalGeo = new THREE.BoxGeometry(2, 5, 1);
-    rival = new THREE.Mesh(rivalGeo, new THREE.MeshPhongMaterial({ color: 0x333333 }));
-    rival.position.set(0, 2.5, -5);
-    scene.add(rival);
-
-    const light = new THREE.PointLight(0xffffff, 1.5, 100);
-    light.position.set(0, 20, 10);
-    scene.add(light, new THREE.AmbientLight(0x404040));
-
-    camera.position.set(0, 8, 22);
-    camera.lookAt(0, 2, -5);
-    
-    MasteringEngineer.applyQualityFix();
-}
-
-function animate() {
-    requestAnimationFrame(animate);
-    
-    if (!isReplaying) {
-        // AI Rival Movement
-        rival.position.x = Math.sin(Date.now() * 0.003) * 6;
+    function processCrypto(coin) {
+        if (!currentItem) {
+            alert("Please select an item from the store first!");
+            return;
+        }
         
-        // Recording for the Engineer's Replay
-        replayBuffer.push(ball.position.clone());
-        if (replayBuffer.length > 60) replayBuffer.shift();
+        let walletAddress = "";
+        if (coin === 'BTC') {
+            walletAddress = "YOUR_BITCOIN_WALLET_ADDRESS_HERE";
+        } else if (coin === 'USDT') {
+            walletAddress = "YOUR_USDT_WALLET_ADDRESS_HERE";
+        }
+
+        // Display prompt for user to send funds manually or connect wallet
+        alert("To complete your purchase of " + currentItem + " ($" + currentPrice + "):\n\nPlease send the equivalent amount of " + coin + " to:\n" + walletAddress + "\n\nOnce transaction is sent, our automated system will verify the blockchain network.");
         
-        // Win Logic
-        if (ball.position.distanceTo(hoop.position) < 1) {
-            triggerSlowMo();
+        // Instant Telegram Push Notification straight to your phone bot
+        sendTelegramNotification(coin + " Blockchain", currentItem, currentPrice, "Awaiting Network Confirmation");
+    }
+
+    // Automated Bot Backend Sync
+    function sendTelegramNotification(method, item, price, status) {
+        const botToken = "YOUR_TELEGRAM_BOT_TOKEN"; 
+        const chatId = "YOUR_TELEGRAM_CHAT_ID"; 
+        const message = `🚨 *New Store Activity* 🚨\n\n*Item:* ${item}\n*Price:* $${price}\n*Gateway:* ${method}\n*Status:* ${status}`;
+
+        if(botToken !== "YOUR_TELEGRAM_BOT_TOKEN") {
+            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            }).catch(err => console.log("Telegram notification error: ", err));
         }
     }
-    
-    renderer.render(scene, camera);
-}
-
-function triggerSlowMo() {
-    isReplaying = true;
-    document.getElementById('status-msg').innerText = "ENGINEER: SLOW-MO REPLAY ACTIVE";
-    let frame = 0;
-    
-    const interval = setInterval(() => {
-        if (frame < replayBuffer.length) {
-            ball.position.copy(replayBuffer[frame]);
-            frame++;
-        } else {
-            clearInterval(interval);
-            isReplaying = false;
-            ball.position.set(0, 1, 10);
-            document.getElementById('status-msg').innerText = "ENGINEER: READY FOR NEXT TRACK";
-        }
-    }, 80);
-}
-
-initGame();
-animate();
 </script>
-</body>
-</html>
 
 
 
