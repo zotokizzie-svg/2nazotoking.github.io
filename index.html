@@ -81,7 +81,6 @@
             box-shadow: 0 4px 15px rgba(0,0,0,0.5);
         }
 
-        /* Specific Platform Highlights */
         .btn-youtube {
             border: 2px solid #ff3b30;
             background: rgba(255, 59, 48, 0.1);
@@ -111,29 +110,39 @@
             font-size: 2rem;
             text-transform: uppercase;
             letter-spacing: 1px;
-            margin-bottom: 20px;
+            margin-bottom: 10px;
             color: #ffcc00;
+        }
+
+        .game-instructions {
+            color: #a0a0a0;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .game-window {
             width: 100%;
             max-width: 800px;
-            height: 500px;
             margin: 0 auto;
-            background: #151515;
+            background: #111111;
             border: 3px solid #34c759;
             border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            overflow: hidden;
             box-shadow: 0 0 30px rgba(52, 199, 89, 0.2);
             position: relative;
         }
 
-        /* Responsive scaling for smaller mobile screens */
+        canvas {
+            display: block;
+            width: 100%;
+            background: #151515;
+            cursor: crosshair;
+        }
+
         @media (max-width: 600px) {
             h1 { font-size: 2rem; }
-            .game-window { height: 400px; }
         }
     </style>
 </head>
@@ -158,11 +167,278 @@
 
     <section class="game-section">
         <h2>DCF: The Answer Edition</h2>
+        <p class="game-instructions">Drag and release anywhere to shoot the ball</p>
         <div class="game-window">
-            <p style="color: #666;">[ Basketball Game Canvas / Script Active ]</p>
+            <canvas id="gameCanvas" width="800" height="500"></canvas>
         </div>
     </section>
 
+    <script>
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // Game Configuration & Physics Constants
+        const gravity = 0.4;
+        const bounce = 0.65;
+        const friction = 0.99;
+
+        let score = 0;
+        let hiScore = 0;
+
+        // Ball Setup
+        let ball = {
+            x: 150,
+            y: 350,
+            radius: 24,
+            vx: 0,
+            vy: 0,
+            isHoopBound: true,
+            isDragging: false,
+            inAir: false
+        };
+
+        // Hoop Setup (The Rim)
+        const hoop = {
+            x: 650,
+            y: 200,
+            radius: 35,
+            backboardX: 695,
+            backboardY: 120,
+            backboardW: 10,
+            backboardH: 120
+        };
+
+        // Drag/Aim State tracking
+        let pointer = { startX: 0, startY: 0, currentX: 0, currentY: 0 };
+
+        // Interaction Handling (Works for Mouse and Touch Devices)
+        function getPos(e) {
+            const rect = canvas.getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return {
+                x: (clientX - rect.left) * (canvas.width / rect.width),
+                y: (clientY - rect.top) * (canvas.height / rect.height)
+            };
+        }
+
+        function startDrag(e) {
+            if (ball.inAir) return;
+            const pos = getPos(e);
+            ball.isDragging = true;
+            pointer.startX = pos.x;
+            pointer.startY = pos.y;
+            pointer.currentX = pos.x;
+            pointer.currentY = pos.y;
+        }
+
+        function drag(e) {
+            if (!ball.isDragging) return;
+            e.preventDefault();
+            const pos = getPos(e);
+            pointer.currentX = pos.x;
+            pointer.currentY = pos.y;
+        }
+
+        function releaseDrag() {
+            if (!ball.isDragging) return;
+            ball.isDragging = false;
+            
+            // Calculate Force Vector from Drag Distance
+            let dx = pointer.startX - pointer.currentX;
+            let dy = pointer.startY - pointer.currentY;
+            
+            ball.vx = dx * 0.12;
+            ball.vy = dy * 0.12;
+            ball.inAir = true;
+            ball.isHoopBound = true;
+        }
+
+        canvas.addEventListener('mousedown', startDrag);
+        canvas.addEventListener('mousemove', drag);
+        window.addEventListener('mouseup', releaseDrag);
+
+        canvas.addEventListener('touchstart', startDrag, { passive: false });
+        canvas.addEventListener('touchmove', drag, { passive: false });
+        window.addEventListener('touchend', releaseDrag);
+
+        // Reset system when shot completes
+        function resetBall() {
+            ball.x = 100 + Math.random() * 150;
+            ball.y = 350 + Math.random() * 50;
+            ball.vx = 0;
+            ball.vy = 0;
+            ball.inAir = false;
+            ball.isHoopBound = true;
+        }
+
+        // Main Simulation Loop
+        function update() {
+            if (ball.inAir) {
+                ball.vy += gravity;
+                ball.x += ball.vx;
+                ball.y += ball.vy;
+                ball.vx *= friction;
+
+                // Base Floor Collision
+                if (ball.y + ball.radius > canvas.height - 20) {
+                    ball.y = canvas.height - 20 - ball.radius;
+                    ball.vy = -ball.vy * bounce;
+                    ball.vx *= 0.8; 
+                }
+                // Left Wall Collision
+                if (ball.x - ball.radius < 0) {
+                    ball.x = ball.radius;
+                    ball.vx = -ball.vx * bounce;
+                }
+
+                // Backboard Rigid Collision
+                if (ball.x + ball.radius > hoop.backboardX && 
+                    ball.x - ball.radius < hoop.backboardX + hoop.backboardW &&
+                    ball.y > hoop.backboardY && ball.y < hoop.backboardY + hoop.backboardH) {
+                    ball.x = hoop.backboardX - ball.radius;
+                    ball.vx = -ball.vx * bounce;
+                }
+
+                // Front Rim Collision Hook
+                let rimLeftX = hoop.x - hoop.radius;
+                let rdx = ball.x - rimLeftX;
+                let rdy = ball.y - hoop.y;
+                let rimDist = Math.sqrt(rdx*rdx + rdy*rdy);
+
+                if (rimDist < ball.radius + 6) {
+                    let angle = Math.atan2(rdy, rdx);
+                    ball.x = rimLeftX + (ball.radius + 6) * Math.cos(angle);
+                    ball.y = hoop.y + (ball.radius + 6) * Math.sin(angle);
+                    ball.vx = -ball.vx * bounce + (Math.cos(angle) * 2);
+                    ball.vy = -ball.vy * bounce + (Math.sin(angle) * 2);
+                }
+
+                // Score Detection (Passing downward clean through the net)
+                if (ball.isHoopBound && ball.vy > 0 && 
+                    ball.x > hoop.x - hoop.radius && ball.x < hoop.x + hoop.radius &&
+                    ball.y > hoop.y && ball.y < hoop.y + 20) {
+                    
+                    score++;
+                    if (score > hiScore) hiScore = score;
+                    ball.isHoopBound = false; // Prevent double trigger on single trajectory
+                }
+
+                // Out of Bounds auto-reset
+                if (ball.x > canvas.width + 100 || Math.abs(ball.vx) < 0.05 && ball.y > canvas.height - 50) {
+                    if (ball.isHoopBound) score = 0; // Miss resets streak
+                    resetBall();
+                }
+            }
+
+            render();
+            requestAnimationFrame(update);
+        }
+
+        // Graphics Render Function
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // Draw Clean Court Floor (Black Theme)
+            ctx.fillStyle = '#0f0f0f';
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+            ctx.strokeStyle = '#333333';
+            ctx.lineWidth = 4;
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height - 20);
+            ctx.lineTo(canvas.width, canvas.height - 20);
+            ctx.stroke();
+
+            // Draw Backboard
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(hoop.backboardX, hoop.backboardY, hoop.backboardW, hoop.backboardH);
+            ctx.strokeStyle = '#ff3b30';
+            ctx.strokeRect(hoop.backboardX, hoop.backboardY + 30, hoop.backboardW, 40);
+
+            // Draw Tricolor Net (Red, Gold, Green)
+            ctx.lineWidth = 3;
+            let netTop = hoop.y;
+            let netHeight = 50;
+            
+            // Red Top Segment
+            ctx.strokeStyle = '#ff3b30';
+            ctx.beginPath();
+            ctx.moveTo(hoop.x - hoop.radius, netTop);
+            ctx.lineTo(hoop.x - hoop.radius + 8, netTop + 15);
+            ctx.moveTo(hoop.x + hoop.radius, netTop);
+            ctx.lineTo(hoop.x + hoop.radius - 8, netTop + 15);
+            ctx.stroke();
+
+            // Gold Middle Segment
+            ctx.strokeStyle = '#ffcc00';
+            ctx.defineLine = ctx.beginPath();
+            ctx.moveTo(hoop.x - hoop.radius + 8, netTop + 15);
+            ctx.lineTo(hoop.x - hoop.radius + 14, netTop + 32);
+            ctx.moveTo(hoop.x + hoop.radius - 8, netTop + 15);
+            ctx.lineTo(hoop.x + hoop.radius - 14, netTop + 32);
+            ctx.stroke();
+
+            // Green Bottom Segment
+            ctx.strokeStyle = '#34c759';
+            ctx.beginPath();
+            ctx.moveTo(hoop.x - hoop.radius + 14, netTop + 32);
+            ctx.lineTo(hoop.x - hoop.radius + 18, netTop + netHeight);
+            ctx.lineTo(hoop.x + hoop.radius - 18, netTop + netHeight);
+            ctx.moveTo(hoop.x + hoop.radius - 14, netTop + 32);
+            ctx.lineTo(hoop.x + hoop.radius - 18, netTop + netHeight);
+            ctx.stroke();
+
+            // Draw Golden Metallic Rim
+            ctx.strokeStyle = '#ffcc00';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            ctx.moveTo(hoop.x - hoop.radius, hoop.y);
+            ctx.lineTo(hoop.x + hoop.radius, hoop.y);
+            ctx.stroke();
+
+            // Draw Aiming Guide Vector Vector line
+            if (ball.isDragging) {
+                ctx.strokeStyle = 'rgba(255, 204, 0, 0.4)';
+                ctx.lineWidth = 3;
+                ctx.setLineDash([6, 6]);
+                ctx.beginPath();
+                ctx.moveTo(ball.x, ball.y);
+                // Projects the opposite trajectory angle
+                let targetX = ball.x + (pointer.startX - pointer.currentX) * 0.8;
+                let targetY = ball.y + (pointer.startY - pointer.currentY) * 0.8;
+                ctx.lineTo(targetX, targetY);
+                ctx.stroke();
+                ctx.setLineDash([]);
+            }
+
+            // Draw Performance Basketball 
+            if (!ball.inAir || ball.isHoopBound) {
+                // Active Premium Ball Look
+                ctx.fillStyle = '#e65c00';
+            } else {
+                // Post Score indicator color change fade
+                ctx.fillStyle = '#34c759';
+            }
+            ctx.beginPath();
+            ctx.arc(ball.x, ball.y, ball.radius, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.strokeStyle = '#000000';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Core Scoreboard Display Text
+            ctx.fillStyle = '#ffffff';
+            ctx.font = "bold 20px 'Courier New', monospace";
+            ctx.textAlign = "left";
+            ctx.fillText(`STREAK: ${score}`, 30, 40);
+            ctx.fillStyle = '#ffcc00';
+            ctx.fillText(`RECORD: ${hiScore}`, 30, 70);
+        }
+
+        // Kick off the script loop initialization
+        resetBall();
+        update();
+    </script>
 </body>
 </html>
 
