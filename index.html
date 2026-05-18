@@ -1,117 +1,168 @@
-<section id="worldwide-store" style="background: #111; color: #fff; padding: 60px 20px; text-align: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
-    <div style="max-width: 1200px; margin: 0 auto;">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dope Cities Finest | Official Hub</title>
+    <style>
+        /* High-End Brand Styling */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Helvetica Neue', Arial, sans-serif;
+        }
+
+        body {
+            background-color: #0b0b0b;
+            color: #ffffff;
+            text-align: center;
+            overflow-x: hidden;
+        }
+
+        /* Brand Colors & Accent Borders */
+        header {
+            background: linear-gradient(90deg, #ff3b30 0%, #ffcc00 50%, #34c759 100%);
+            padding: 5px;
+        }
+
+        .hero-section {
+            padding: 60px 20px;
+            background: radial-gradient(circle, #1a1a1a 0%, #0a0a0a 100%);
+            border-bottom: 2px solid #ffcc00;
+        }
+
+        /* Black Star Motif Styling */
+        .black-star {
+            font-size: 3rem;
+            color: #000000;
+            text-shadow: 0 0 10px #ffcc00, 0 0 20px #ffcc00;
+            margin-bottom: 10px;
+            display: inline-block;
+        }
+
+        h1 {
+            font-size: 2.8rem;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            color: #ffffff;
+        }
+
+        p.subtitle {
+            color: #a0a0a0;
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+        }
+
+        /* YouTube & Social Traffic Launchpad */
+        .links-container {
+            max-width: 500px;
+            margin: 0 auto 50px auto;
+            padding: 0 20px;
+        }
+
+        .btn {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #1f1f1f;
+            color: #ffffff;
+            text-decoration: none;
+            padding: 18px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1.1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            border: 1px solid #333;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+
+        /* Specific Platform Highlights */
+        .btn-youtube {
+            border: 2px solid #ff3b30;
+            background: rgba(255, 59, 48, 0.1);
+        }
+        .btn-youtube:hover {
+            background: #ff3b30;
+            box-shadow: 0 0 20px rgba(255, 59, 48, 0.6);
+        }
+
+        .btn-instagram {
+            border: 2px solid #ffcc00;
+            background: rgba(255, 204, 0, 0.1);
+        }
+        .btn-instagram:hover {
+            background: #ffcc00;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 204, 0, 0.6);
+        }
+
+        /* Game Zone Container */
+        .game-section {
+            padding: 40px 20px;
+            background: #0d0d0d;
+        }
+
+        h2 {
+            font-size: 2rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 20px;
+            color: #ffcc00;
+        }
+
+        .game-window {
+            width: 100%;
+            max-width: 800px;
+            height: 500px;
+            margin: 0 auto;
+            background: #151515;
+            border: 3px solid #34c759;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px rgba(52, 199, 89, 0.2);
+            position: relative;
+        }
+
+        /* Responsive scaling for smaller mobile screens */
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .game-window { height: 400px; }
+        }
+    </style>
+</head>
+<body>
+
+    <header></header>
+
+    <section class="hero-section">
+        <div class="black-star">★</div>
+        <h1>Dope Cities Finest</h1>
+        <p class="subtitle">Official Digital Headquarters</p>
         
-        <h2 style="font-size: 2.5rem; color: #FFCC00; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 10px;">
-            Worldwide Management & Digital Store
-        </h2>
-        <p style="color: #009B4F; font-size: 1.2rem; margin-bottom: 40px; font-weight: bold;">
-            ★ Secure International Bookings, Music Sales & Digital Assets ★
-        </p>
-
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; margin-bottom: 50px;">
-
-            <div style="background: #222; border: 2px solid #FF3333; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                <h3 style="color: #fff; margin-top: 0;">Global Audio Streaming / License</h3>
-                <p style="color: #aaa; font-size: 0.9rem;">Get broadcast-ready wav files & international commercial distribution rights.</p>
-                <div style="font-size: 1.5rem; color: #FFCC00; margin: 20px 0; font-weight: bold;">$19.99</div>
-                <a href="https://rapfame.app/u/2nazotokizzie" target="_blank" style="display: block; margin: 15px auto; padding: 10px; background: #222; color: #FFCC00; border: 1px solid #FFCC00; border-radius: 5px; text-decoration: none; font-size: 0.9rem; text-align: center; font-weight: bold;">🎵 Preview Tracks</a>
-                <button onclick="openPaymentModal('Audio License', 19.99)" style="background: #009B4F; color: #fff; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; width: 100%;">Buy Now</button>
-            </div>
-
-            <div style="background: #222; border: 2px solid #FFCC00; padding: 25px; border-radius: 8px; box-shadow: 0 4px 15px rgba(0,0,0,0.5);">
-                <h3 style="color: #fff; margin-top: 0;">International Booking Deposit</h3>
-                <p style="color: #aaa; font-size: 0.9rem;">Secure show bookings, feature verses, and global festival appearances.</p>
-                <div style="font-size: 1.5rem; color: #FFCC00; margin: 20px 0; font-weight: bold;">$500.00</div>
-                <button onclick="openPaymentModal('Booking Deposit', 500.00)" style="background: #FFCC00; color: #000; border: none; padding: 12px 25px; border-radius: 5px; cursor: pointer; width: 100%;">Book Now</button>
-            </div>
-
+        <div class="links-container">
+            <a href="https://www.youtube.com/@YOUR_CHANNEL" target="_blank" class="btn btn-youtube">
+                ▶ Subscribe on YouTube
+            </a>
+            <a href="https://www.instagram.com/zotokizzie2na" target="_blank" class="btn btn-instagram">
+                📸 Follow on Instagram
+            </a>
         </div>
+    </section>
 
-            <div style="display: flex; flex-direction: column; gap: 15px;">
-                <div style="display: flex; gap: 10px;">
-                    <button onclick="processFiat('Paystack')" style="flex: 1; background: #00a3e0; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer;">
-                        Pay with Paystack (MoMo / Card)
-                    </button>
-                    <button onclick="processFiat('Flutterwave')" style="flex: 1; background: #fb4e4e; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer;">
-                        Pay with Flutterwave
-                    </button>
-                </div>
-
-                <div style="border-top: 1px solid #333; padding-top: 20px; margin-top: 5px;">
-                    <p style="color: #FFCC00; font-size: 0.9rem; margin-bottom: 12px; font-weight: bold; text-transform: uppercase; letter-spacing: 1px;">
-                        ⚡ Pay Anonymously with Crypto ⚡
-                    </p>
-                    <button onclick="processCrypto('BTC')" style="width: 100%; background: #f7931a; color: white; border: none; padding: 15px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 1.1rem; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px;">
-                        <span>&#8383;</span> Pay with Bitcoin (BTC)
-                    </button>
-                    <button onclick="processCrypto('USDT')" style="width: 100%; background: #26a17b; color: white; border: none; padding: 12px; font-weight: bold; border-radius: 5px; cursor: pointer; font-size: 1rem;">
-                        Pay with USDT (Tether)
-                    </button>
-                </div>
-            </div>
+    <section class="game-section">
+        <h2>DCF: The Answer Edition</h2>
+        <div class="game-window">
+            <p style="color: #666;">[ Basketball Game Canvas / Script Active ]</p>
         </div>
+    </section>
 
-    </div>
-</section>
+</body>
+</html>
 
-<script>
-    let currentItem = '';
-    let currentPrice = 0;
-
-    function openPaymentModal(itemName, itemPrice) {
-        currentItem = itemName;
-        currentPrice = itemPrice;
-        alert("Selected: " + itemName + " - $" + itemPrice + "\nPlease choose a payment gateway below.");
-    }
-
-    function processFiat(provider) {
-        if (!currentItem) {
-            alert("Please select an item from the store first!");
-            return;
-        }
-        alert("Redirecting to " + provider + " secure gateway to process $" + currentPrice + " for " + currentItem);
-        sendTelegramNotification(provider, currentItem, currentPrice, "Pending Fiat Verification");
-    }
-
-    function processCrypto(coin) {
-        if (!currentItem) {
-            alert("Please select an item from the store first!");
-            return;
-        }
-        
-        let walletAddress = "";
-        if (coin === 'BTC') {
-            walletAddress = "15X6cpAZzhE3ST9yPKoEEi5je9RpprtjAF";
-        } else if (coin === 'USDT') {
-            walletAddress = "TNXErnxLyudZ9zDZFniZHJtiYFCdjQb9sy";
-        }
-
-        alert("To complete your purchase of " + currentItem + " ($" + currentPrice + "):\n\nPlease send the equivalent amount of " + coin + " to:\n" + walletAddress + "\n\nOnce transaction is sent, our automated system will verify the blockchain network.");
-        sendTelegramNotification(coin + " Blockchain", currentItem, currentPrice, "Awaiting Network Confirmation");
-    }
-
-
-  function sendTelegramNotification(method, item, price, status) {
-    const botToken = "8676515363:AAFfajoTs-UVd7KTbk5gb3XelwnuQE20YFg";
-    const chatId = "const chatId = "YOUR_TELEGRAM_CHAT_ID";
-";
-  
-
- 
-        
-        
-        
-
-        if(botToken !== "YOUR_TELEGRAM_BOT_TOKEN") {
-            fetch(`https://api.telegram.org/bot${botToken}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: chatId,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
-            }).catch(err => console.log("Telegram notification error: ", err));
-        }
-    }
-</script>
