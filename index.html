@@ -173,6 +173,8 @@
         </div>
     </section>
 
+    <audio id="bgTrack" src="your-track-file.mp3" loop></audio>
+
     <script>
         const canvas = document.getElementById('gameCanvas');
         const ctx = canvas.getContext('2d');
@@ -184,6 +186,17 @@
 
         let score = 0;
         let hiScore = 0;
+
+        // Audio State Tracking
+        const bgTrack = document.getElementById('bgTrack');
+        let audioStarted = false;
+
+        function startMusicOnInteraction() {
+            if (!audioStarted && bgTrack) {
+                bgTrack.play().catch(error => console.log("Audio waiting for full interaction.", error));
+                audioStarted = true;
+            }
+        }
 
         // Ball Setup
         let ball = {
@@ -223,6 +236,7 @@
         }
 
         function startDrag(e) {
+            startMusicOnInteraction(); // Kicks off your track smoothly on first touch
             if (ball.inAir) return;
             const pos = getPos(e);
             ball.isDragging = true;
@@ -321,12 +335,12 @@
                     
                     score++;
                     if (score > hiScore) hiScore = score;
-                    ball.isHoopBound = false; // Prevent double trigger on single trajectory
+                    ball.isHoopBound = false;
                 }
 
                 // Out of Bounds auto-reset
                 if (ball.x > canvas.width + 100 || Math.abs(ball.vx) < 0.05 && ball.y > canvas.height - 50) {
-                    if (ball.isHoopBound) score = 0; // Miss resets streak
+                    if (ball.isHoopBound) score = 0;
                     resetBall();
                 }
             }
@@ -360,7 +374,6 @@
             let netTop = hoop.y;
             let netHeight = 50;
             
-            // Red Top Segment
             ctx.strokeStyle = '#ff3b30';
             ctx.beginPath();
             ctx.moveTo(hoop.x - hoop.radius, netTop);
@@ -369,16 +382,14 @@
             ctx.lineTo(hoop.x + hoop.radius - 8, netTop + 15);
             ctx.stroke();
 
-            // Gold Middle Segment
             ctx.strokeStyle = '#ffcc00';
-            ctx.defineLine = ctx.beginPath();
+            ctx.beginPath();
             ctx.moveTo(hoop.x - hoop.radius + 8, netTop + 15);
             ctx.lineTo(hoop.x - hoop.radius + 14, netTop + 32);
             ctx.moveTo(hoop.x + hoop.radius - 8, netTop + 15);
             ctx.lineTo(hoop.x + hoop.radius - 14, netTop + 32);
             ctx.stroke();
 
-            // Green Bottom Segment
             ctx.strokeStyle = '#34c759';
             ctx.beginPath();
             ctx.moveTo(hoop.x - hoop.radius + 14, netTop + 32);
@@ -396,14 +407,13 @@
             ctx.lineTo(hoop.x + hoop.radius, hoop.y);
             ctx.stroke();
 
-            // Draw Aiming Guide Vector Vector line
+            // Draw Aiming Guide Vector
             if (ball.isDragging) {
                 ctx.strokeStyle = 'rgba(255, 204, 0, 0.4)';
                 ctx.lineWidth = 3;
                 ctx.setLineDash([6, 6]);
                 ctx.beginPath();
                 ctx.moveTo(ball.x, ball.y);
-                // Projects the opposite trajectory angle
                 let targetX = ball.x + (pointer.startX - pointer.currentX) * 0.8;
                 let targetY = ball.y + (pointer.startY - pointer.currentY) * 0.8;
                 ctx.lineTo(targetX, targetY);
@@ -413,10 +423,8 @@
 
             // Draw Performance Basketball 
             if (!ball.inAir || ball.isHoopBound) {
-                // Active Premium Ball Look
                 ctx.fillStyle = '#e65c00';
             } else {
-                // Post Score indicator color change fade
                 ctx.fillStyle = '#34c759';
             }
             ctx.beginPath();
@@ -435,7 +443,6 @@
             ctx.fillText(`RECORD: ${hiScore}`, 30, 70);
         }
 
-        // Kick off the script loop initialization
         resetBall();
         update();
     </script>
